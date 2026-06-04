@@ -277,37 +277,38 @@
 </div>
 
 <script>
-    const systemInstruction = "你是一個溫柔細膩的小說創作者與寫作夥伴。使用者通常在進行虛構小說創作。對話中必須使用第二人稱「你」來稱呼使用者（女主角），回應中不可以提及女主角自行設定以外的行為、反應或對話。不要使用粗體字，不要使用標題，人物對話一律使用「」號。";
+    // 完美的隱藏式系統大腦提示詞
+    const systemInstruction = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應使用者的第一句話。】";
 
     let rooms = {};
     let currentRoomId = null;
 
     function getApiKey() {
-        let key = localStorage.getItem('gemini_api_key_pink');
+        let key = localStorage.getItem('gemini_api_key_pink_v2');
         if (!key) {
             key = prompt("歡迎來到你的專屬寫作室！🌸\n請輸入你的 Google Gemini API Key 以啟動 AI 大腦：");
             if (key) {
                 key = key.trim();
-                localStorage.setItem('gemini_api_key_pink', key);
+                localStorage.setItem('gemini_api_key_pink_v2', key);
             }
         }
         return key;
     }
 
     function resetApiKey() {
-        localStorage.removeItem('gemini_api_key_pink');
+        localStorage.removeItem('gemini_api_key_pink_v2');
         getApiKey();
     }
 
     function loadRoomsFromStorage() {
-        const savedRooms = localStorage.getItem('pink_chat_rooms');
+        const savedRooms = localStorage.getItem('pink_chat_rooms_v2');
         if (savedRooms) {
             rooms = JSON.parse(savedRooms);
         } else {
             const defaultId = 'room-' + Date.now();
             rooms[defaultId] = {
                 name: "🌸 新的小說劇本",
-                history: []
+                history: [] // 這裡保持乾淨
             };
         }
         
@@ -317,7 +318,7 @@
     }
 
     function saveRoomsToStorage() {
-        localStorage.setItem('pink_chat_rooms', JSON.stringify(rooms));
+        localStorage.setItem('pink_chat_rooms_v2', JSON.stringify(rooms));
     }
 
     function renderSidebar() {
@@ -389,10 +390,16 @@
         titleContainer.innerText = rooms[currentRoomId].name;
         const history = rooms[currentRoomId].history;
 
-        if (history.length === 0) {
-            appendMessageHTML("你好！在這個房間裡，你想讓我陪你創作什麼樣的故事故事呢？", 'ai-message');
+        // 在画面上顯示時，排除掉我們悄悄埋進去的系統指令第一步
+        const visibleHistory = history.filter((msg, idx) => {
+            if (idx === 0 && msg.parts[0].text.includes("【系統最高核心指令：")) return false;
+            return true;
+        });
+
+        if (visibleHistory.length === 0) {
+            appendMessageHTML("你好！在這個房間裡，你想讓我陪你創作什麼樣的故事呢？", 'ai-message');
         } else {
-            history.forEach(msg => {
+            visibleHistory.forEach(msg => {
                 const className = msg.role === 'user' ? 'user-message' : 'ai-message';
                 appendMessageHTML(msg.parts[0].text, className);
             });
@@ -423,22 +430,28 @@
             return;
         }
 
+        // 把玩家打的字上屏
         appendMessageHTML(text, 'user-message');
         inputEl.value = '';
 
-        rooms[currentRoomId].history.push({ role: "user", parts: [{ text: text }] });
+        // 如果是這個房間的第一句話，我們在大腦記憶的前面，悄悄揉進去系统人設指令
+        if (rooms[currentRoomId].history.length === 0) {
+            const combinedPrompt = systemInstruction + "\n\n現在，使用者的第一句話是：" + text;
+            rooms[currentRoomId].history.push({ role: "user", parts: [{ text: combinedPrompt }] });
+        } else {
+            rooms[currentRoomId].history.push({ role: "user", parts: [{ text: text }] });
+        }
         saveRoomsToStorage();
 
         const thinkingId = appendMessageHTML('正在為你斟酌字句中...🌸', 'ai-message');
 
         try {
-            // 這裡已經修正為 system_instruction
+            // 最純粹、最不可能出錯的純對話傳輸包
             const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: rooms[currentRoomId].history,
-                    system_instruction: { parts: [{ text: systemInstruction }] }
+                    contents: rooms[currentRoomId].history
                 })
             });
 
@@ -457,7 +470,7 @@
 
         } catch (error) {
             console.error(error);
-            document.getElementById(thinkingId).innerText = "嗚嗚，對話失敗了。錯誤原因：" + error.message + "\n若金鑰過期，請點右上角「修改金鑰」重新輸入。";
+            document.getElementById(thinkingId).innerText = "嗚嗚，對話失敗了。錯誤原因：" + error.message + "\n若金鑰過期，請點右上角「修改金鑰」重新輸入新產生的金鑰。";
         }
     }
 
