@@ -6,9 +6,9 @@
     <title>我的專屬 AI 寫作閨房</title>
     <style>
         :root {
-            --pink-primary: #ffb6c1; /* 經典淺粉紅 */
-            --pink-light: #fff0f2;   /* 超柔和粉白 */
-            --pink-dark: #ff8da1;    /* 深粉點綴 */
+            --pink-primary: #ffb6c1; 
+            --pink-light: #fff0f2;   
+            --pink-dark: #ff8da1;    
             --bg-white: #ffffff;
             --text-main: #4a4a4a;
         }
@@ -30,7 +30,6 @@
             padding: 10px;
         }
 
-        /* 主容器 */
         .app-container {
             display: flex;
             width: 100%;
@@ -44,7 +43,6 @@
             overflow: hidden;
         }
 
-        /* 左側邊欄：多房間切換 */
         .sidebar {
             width: 260px;
             background: rgba(255, 240, 242, 0.7);
@@ -128,7 +126,6 @@
             color: var(--pink-dark);
         }
 
-        /* 右側主要聊天區 */
         .main-chat {
             flex: 1;
             display: flex;
@@ -161,7 +158,6 @@
             font-weight: 500;
         }
 
-        /* 對話紀錄盒子 */
         .chat-box {
             flex-grow: 1;
             padding: 20px;
@@ -172,7 +168,6 @@
             gap: 15px;
         }
 
-        /* 訊息氣泡美化 */
         .message {
             max-width: 75%;
             padding: 12px 16px;
@@ -183,7 +178,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        /* 使用者訊息：淺粉色、靠右 */
         .user-message {
             background-color: var(--pink-primary);
             color: white;
@@ -191,7 +185,6 @@
             border-bottom-right-radius: 4px;
         }
 
-        /* AI 訊息：純白帶粉邊、靠左 */
         .ai-message {
             background-color: var(--bg-white);
             color: var(--text-main);
@@ -201,7 +194,6 @@
             white-space: pre-wrap;
         }
 
-        /* 輸入區域 */
         .input-area {
             padding: 15px 20px;
             background: var(--bg-white);
@@ -243,7 +235,6 @@
             background: var(--pink-dark);
         }
 
-        /* 隱藏滾動條樣式，保持乾淨 */
         .chat-box::-webkit-scrollbar, .room-list::-webkit-scrollbar {
             width: 5px;
         }
@@ -252,7 +243,6 @@
             border-radius: 10px;
         }
 
-        /* 平板直式或手機自動縮小側邊欄 */
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .sidebar { width: 100%; height: 25vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.4); }
@@ -267,8 +257,7 @@
     <div class="sidebar">
         <div class="sidebar-title">🌸 我的小說靈感庫</div>
         <div class="btn-add-room" onclick="createNewRoom()">＋ 開啟新聊天室</div>
-        <div class="room-list" id="room-list">
-            </div>
+        <div class="room-list" id="room-list"></div>
     </div>
 
     <div class="main-chat">
@@ -277,8 +266,7 @@
             <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
         </div>
         
-        <div class="chat-box" id="chat-box">
-            </div>
+        <div class="chat-box" id="chat-box"></div>
         
         <div class="input-area">
             <input type="text" class="chat-input" id="chat-input" placeholder="對 AI 說點什麼吧..." onkeydown="if(event.key === 'Enter') sendMessage()">
@@ -289,15 +277,11 @@
 </div>
 
 <script>
-    // 固定的系統大腦人設
     const systemInstruction = "你是一個溫柔細膩的小說創作者與寫作夥伴。使用者通常在進行虛構小說創作。對話中必須使用第二人稱「你」來稱呼使用者（女主角），回應中不可以提及女主角自行設定以外的行為、反應或對話。不要使用粗體字，不要使用標題，人物對話一律使用「」號。";
 
-    // 儲存所有聊天室的物件結構
-    // 格式： { 房間ID: { name: "房間名稱", history: [聊天紀錄] } }
     let rooms = {};
     let currentRoomId = null;
 
-    // 1. 取得 API Key 的安全隱私機制
     function getApiKey() {
         let key = localStorage.getItem('gemini_api_key_pink');
         if (!key) {
@@ -315,13 +299,11 @@
         getApiKey();
     }
 
-    // 2. 從本機瀏覽器記憶體載入所有房間
     function loadRoomsFromStorage() {
         const savedRooms = localStorage.getItem('pink_chat_rooms');
         if (savedRooms) {
             rooms = JSON.parse(savedRooms);
         } else {
-            // 如果是全新開啟，預設給一個初始房間
             const defaultId = 'room-' + Date.now();
             rooms[defaultId] = {
                 name: "🌸 新的小說劇本",
@@ -329,18 +311,15 @@
             };
         }
         
-        // 預設選取第一個房間
         currentRoomId = Object.keys(rooms)[0];
         renderSidebar();
         renderChatBox();
     }
 
-    // 儲存當前狀態到本機記憶體
     function saveRoomsToStorage() {
         localStorage.setItem('pink_chat_rooms', JSON.stringify(rooms));
     }
 
-    // 3. 渲染左側房間列表
     function renderSidebar() {
         const listContainer = document.getElementById('room-list');
         listContainer.innerHTML = '';
@@ -358,7 +337,6 @@
         });
     }
 
-    // 4. 建立新聊天室房間
     function createNewRoom() {
         const roomName = prompt("請輸入新聊天室的劇本主題名稱：", "🎬 未命名故事線");
         if (!roomName) return;
@@ -375,16 +353,14 @@
         renderChatBox();
     }
 
-    // 5. 切換聊天室
     function switchRoom(id) {
         currentRoomId = id;
         renderSidebar();
         renderChatBox();
     }
 
-    // 6. 刪除聊天室
     function deleteRoom(event, id) {
-        event.stopPropagation(); // 防止觸發切換房間
+        event.stopPropagation(); 
         if (Object.keys(rooms).length <= 1) {
             alert("最少要保留一個聊天室喔！");
             return;
@@ -400,7 +376,6 @@
         }
     }
 
-    // 7. 渲染右側聊天室對話紀錄
     function renderChatBox() {
         const chatBox = document.getElementById('chat-box');
         const titleContainer = document.getElementById('current-room-title');
@@ -425,7 +400,6 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // 輔助把訊息塞進畫面
     function appendMessageHTML(text, className) {
         const chatBox = document.getElementById('chat-box');
         const msgDiv = document.createElement('div');
@@ -438,7 +412,6 @@
         return id;
     }
 
-    // 8. 發送訊息主邏輯
     async function sendMessage() {
         const inputEl = document.getElementById('chat-input');
         const text = inputEl.value.trim();
@@ -450,25 +423,22 @@
             return;
         }
 
-        // 把玩家打的字上屏
         appendMessageHTML(text, 'user-message');
         inputEl.value = '';
 
-        // 推入該房間的記憶庫
         rooms[currentRoomId].history.push({ role: "user", parts: [{ text: text }] });
         saveRoomsToStorage();
 
-        // 建立 AI 思考泡泡
         const thinkingId = appendMessageHTML('正在為你斟酌字句中...🌸', 'ai-message');
 
         try {
-            // 使用正式、穩定的 v1 API 通道
+            // 這裡已經修正為 system_instruction
             const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: rooms[currentRoomId].history,
-                    systemInstruction: { parts: [{ text: systemInstruction }] }
+                    system_instruction: { parts: [{ text: systemInstruction }] }
                 })
             });
 
@@ -480,10 +450,8 @@
             const data = await response.json();
             const aiText = data.candidates[0].content.parts[0].text;
 
-            // 將思考泡泡替換成真正的 AI 回覆
             document.getElementById(thinkingId).innerText = aiText;
 
-            // 推入 AI 的回應到記憶庫
             rooms[currentRoomId].history.push({ role: "model", parts: [{ text: aiText }] });
             saveRoomsToStorage();
 
@@ -493,7 +461,6 @@
         }
     }
 
-    // 網頁載入時的初始化啟動
     loadRoomsFromStorage();
 </script>
 
