@@ -41,6 +41,12 @@
             box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.6);
             overflow: hidden;
+            animation: appSpawn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes appSpawn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .sidebar {
@@ -69,7 +75,7 @@
             border-radius: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             margin-bottom: 15px;
             text-align: center;
         }
@@ -77,6 +83,8 @@
         .btn-add-room:hover {
             background: var(--pink-primary);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
         }
 
         .room-list {
@@ -96,14 +104,22 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid transparent;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             font-size: 14px;
         }
 
-        .room-item:hover, .room-item.active {
+        .room-item:hover {
             background: #ffe3e7;
             border-color: var(--pink-primary);
-            transform: translateY(-1px);
+            transform: translateX(4px);
+        }
+
+        .room-item.active {
+            background: #ffe3e7;
+            border-color: var(--pink-primary);
+            font-weight: 500;
+            transform: translateX(6px);
+            box-shadow: -4px 0 0 var(--pink-dark);
         }
 
         .room-name {
@@ -120,6 +136,7 @@
             cursor: pointer;
             font-size: 12px;
             padding: 0 5px;
+            transition: color 0.2s;
         }
 
         .btn-delete-room:hover {
@@ -147,8 +164,30 @@
             color: #555;
         }
 
-        .btn-config-key {
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quota-panel {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
             background: var(--pink-light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            color: #7a6065;
+        }
+
+        .quota-val {
+            color: var(--pink-dark);
+            font-weight: 600;
+        }
+
+        .btn-config-key {
+            background: var(--bg-white);
             color: var(--pink-dark);
             border: 1px solid var(--pink-primary);
             padding: 5px 12px;
@@ -156,6 +195,12 @@
             font-size: 12px;
             cursor: pointer;
             font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-config-key:hover {
+            background: var(--pink-light);
+            transform: translateY(-1px);
         }
 
         .chat-box {
@@ -165,13 +210,19 @@
             background-color: #fafafa;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .message-container {
             display: flex;
             flex-direction: column;
             max-width: 85%;
+            animation: msgSpawn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes msgSpawn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message-container.user {
@@ -190,8 +241,9 @@
             font-size: 15px;
             line-height: 1.5;
             word-break: break-all;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.03);
             white-space: pre-wrap;
+            transition: box-shadow 0.2s;
         }
 
         .user-message {
@@ -209,30 +261,47 @@
 
         .message-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-top: 6px;
-            font-size: 13px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            padding: 0 5px;
-        }
-
-        .message-container:hover .message-actions {
-            opacity: 1;
+            padding: 0 4px;
         }
 
         .action-btn {
-            background: none;
+            background-color: var(--pink-primary);
+            color: white;
             border: none;
-            color: #aaa;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
             cursor: pointer;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
+            box-shadow: 0 2px 5px rgba(255, 182, 193, 0.4);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .action-btn:hover {
-            color: var(--pink-dark);
+            background-color: var(--pink-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 141, 161, 0.5);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading-pulse {
+            background: linear-gradient(90deg, #ffffff 0%, #fff0f2 50%, #ffffff 100%);
+            background-size: 200% 100%;
+            animation: pulseBg 1.5s infinite linear;
+            border: 1px solid var(--pink-primary);
+        }
+
+        @keyframes pulseBg {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .edit-textarea {
@@ -247,6 +316,7 @@
             outline: none;
             resize: vertical;
             margin-bottom: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .edit-controls {
@@ -261,6 +331,7 @@
             font-size: 13px;
             cursor: pointer;
             border: none;
+            transition: transform 0.2s;
         }
 
         .btn-edit-save {
@@ -268,10 +339,14 @@
             color: white;
         }
 
+        .btn-edit-save:hover { background: var(--pink-dark); transform: translateY(-1px); }
+
         .btn-edit-cancel {
             background: #eee;
             color: #666;
         }
+        
+        .btn-edit-cancel:hover { transform: translateY(-1px); }
 
         .input-area {
             padding: 15px 20px;
@@ -316,12 +391,19 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5);
         }
 
         .btn-send:hover {
             background: var(--pink-dark);
+            transform: scale(1.08) rotate(-5deg);
+            box-shadow: 0 6px 14px rgba(255, 141, 161, 0.6);
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
         }
 
         .chat-box::-webkit-scrollbar, .room-list::-webkit-scrollbar, .chat-input::-webkit-scrollbar {
@@ -336,6 +418,8 @@
             .app-container { flex-direction: column; }
             .sidebar { width: 100%; height: 25vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.4); }
             .main-chat { height: 67vh; }
+            .header-right { gap: 8px; }
+            .quota-panel { display: none; }
         }
     </style>
 </head>
@@ -352,7 +436,13 @@
     <div class="main-chat">
         <div class="chat-header">
             <div class="current-room-title" id="current-room-title">請選擇或建立聊天室</div>
-            <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
+            <div class="header-right">
+                <div class="quota-panel">
+                    <div>剩餘額度: <span class="quota-val" id="quota-count">15</span>/15</div>
+                    <div>下次更新: <span class="quota-val" id="quota-timer">60s</span></div>
+                </div>
+                <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
+            </div>
         </div>
         
         <div class="chat-box" id="chat-box"></div>
@@ -375,6 +465,30 @@
     let rooms = {};
     let currentRoomId = null;
     let isProcessing = false;
+    let currentQuota = parseInt(localStorage.getItem('pink_writer_quota') || '15');
+
+    function initQuotaSystem() {
+        document.getElementById('quota-count').innerText = currentQuota;
+        setInterval(() => {
+            const now = new Date();
+            const secondsLeft = 60 - now.getSeconds();
+            document.getElementById('quota-timer').innerText = secondsLeft + '秒';
+            
+            if (secondsLeft === 60) {
+                currentQuota = 15;
+                localStorage.setItem('pink_writer_quota', currentQuota);
+                document.getElementById('quota-count').innerText = currentQuota;
+            }
+        }, 1000);
+    }
+
+    function useQuota() {
+        if (currentQuota > 0) {
+            currentQuota--;
+            localStorage.setItem('pink_writer_quota', currentQuota);
+            document.getElementById('quota-count').innerText = currentQuota;
+        }
+    }
 
     function autoResizeInput(el) {
         el.style.height = '50px';
@@ -527,13 +641,13 @@
             if (type === 'user') {
                 const editBtn = document.createElement('button');
                 editBtn.className = 'action-btn';
-                editBtn.innerHTML = '✎ 編輯';
+                editBtn.innerHTML = '✎ 更改提示';
                 editBtn.onclick = () => enableEditMode(container, index, text);
                 actionsDiv.appendChild(editBtn);
             } else if (type === 'ai') {
                 const refreshBtn = document.createElement('button');
                 refreshBtn.className = 'action-btn';
-                refreshBtn.innerHTML = '↻ 重新生成';
+                refreshBtn.innerHTML = '↻ 刷新回答';
                 refreshBtn.onclick = () => regenerateMessage(index);
                 actionsDiv.appendChild(refreshBtn);
             }
@@ -617,12 +731,13 @@
         if (!apiKey) return;
 
         isProcessing = true;
+        useQuota();
         const chatBox = document.getElementById('chat-box');
         
         const loadingContainer = document.createElement('div');
         loadingContainer.className = 'message-container ai';
         const loadingMsg = document.createElement('div');
-        loadingMsg.className = 'message ai-message';
+        loadingMsg.className = 'message ai-message loading-pulse';
         loadingMsg.innerText = '正在為你斟酌字句中...🌸';
         loadingContainer.appendChild(loadingMsg);
         chatBox.appendChild(loadingContainer);
@@ -657,6 +772,7 @@
         }
     }
 
+    initQuotaSystem();
     loadRoomsFromStorage();
 </script>
 
