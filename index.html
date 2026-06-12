@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的專專屬 AI 寫作閨房</title>
+    <title>我的專屬 AI 寫作閨房</title>
     <style>
         :root {
             --pink-primary: #ffb6c1; 
@@ -536,6 +536,9 @@
                 <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="handleRestoreFile(this)">
                 <button class="btn-data-transfer" onclick="triggerRestoreFileInput()" title="上傳備份檔案還原全站資料">🚀 還原進度檔案</button>
                 
+                <input type="file" id="archive-file-input" accept=".webarchive,.html,.mhtml,.txt" style="display: none;" onchange="handleArchiveFile(this)">
+                <button class="btn-data-transfer" style="background: #fff0f2; border-color: var(--pink-dark);" onclick="triggerArchiveFileInput()" title="直接上傳舊的網頁封存檔抽離資料">🔮 從舊網頁封存檔還原</button>
+                
                 <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
             </div>
         </div>
@@ -555,7 +558,7 @@
 </div>
 
 <script>
-    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
+    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用 any 標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
 
     let rooms = {};
     let currentRoomId = null;
@@ -1011,7 +1014,6 @@
         document.body.removeChild(link);
     }
 
-    // 全新優化：平板免複製！直接下載成備份檔案
     function downloadAllDataBackup() {
         const dataPackage = {
             rooms: localStorage.getItem('pink_chat_rooms_v3') || '[]',
@@ -1031,12 +1033,10 @@
         document.body.removeChild(link);
     }
 
-    // 觸發隱藏的檔案上傳點
     function triggerRestoreFileInput() {
         document.getElementById('restore-file-input').click();
     }
 
-    // 讀取上傳的檔案並直接還原資料
     function handleRestoreFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -1059,13 +1059,128 @@
                 console.error(err);
                 alert("檔案讀取發生錯誤，請確認上傳的是正確的備份 .json 檔案。");
             }
-            // 清空選擇，讓同一個檔案能重複觸發
             input.value = '';
         };
         reader.readAsText(file);
     }
 
-    window.addEventListener('DOMContentLoaded', loadAppInitialization);
+    // 【極速救援核心】觸發讀取網頁封存檔的上傳按鈕
+    function triggerArchiveFileInput() {
+        document.getElementById('archive-file-input').click();
+    }
+
+    // 解析舊網頁封存檔、html 檔案並抓回資料
+    function handleArchiveFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rawText = e.target.result;
+            
+            // 尋找網頁封存檔中寫死的 localStorage 痕跡（通常封存在網頁最底部的 JSON 或是快取區塊）
+            let matchRooms = rawText.match(/&quot;pink_chat_rooms_v3&quot;:\s*&quot;([^&]+)&quot;/);
+            if (!matchRooms) {
+                matchRooms = rawText.match(/"pink_chat_rooms_v3":\s*"([^"]+)"/);
+            }
+            
+            let matchMemory = rawText.match(/&quot;pink_writer_memory&quot;:\s*&quot;([^&]+)&quot;/);
+            if (!matchMemory) {
+                matchMemory = rawText.match(/"pink_writer_memory":\s*"([^"]+)"/);
+            }
+
+            try {
+                let foundRoomsStr = null;
+                let foundMemoryStr = "";
+
+                if (matchRooms && matchRooms[1]) {
+                    // 解碼可能被跳脫的文字
+                    foundRoomsStr = matchRooms[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                    // 修正 HTML 實體編碼
+                    foundRoomsStr = foundRoomsStr.replace(/&quot;/g, '"');
+                }
+                
+                if (matchMemory && matchMemory[1]) {
+                    foundMemoryStr = matchMemory[1].replace(/\\n/g, '\n').replace(/&quot;/g, '"');
+                }
+
+                // 精準二次深度搜查：如果上面的正則沒抓到，改抓凍結在舊 HTML 內部的 room-name 結構
+                if (!foundRoomsStr) {
+                    alert("抱歉，無法從此檔案的系統快取中直接析出資料。我們將自動啟動「文字結構深度打撈」...");
+                    // 嘗試撈取文字結構進行局部重建
+                    reconstructFromHTML(rawText);
+                    return;
+                }
+
+                // 如果順利找到完整的靈魂封裝，直接完美還原
+                if (confirm("🎉 奇蹟發生！成功從網頁封存檔中提煉出你之前消失的所有劇本與記憶庫！\n點擊確認將立即全面覆蓋並復活你的故事線。")) {
+                    // 還原進快取
+                    localStorage.setItem('pink_chat_rooms_v3', JSON.parse(`"${foundRoomsStr}"`));
+                    if (foundMemoryStr) {
+                        localStorage.setItem('pink_writer_memory', JSON.parse(`"${foundMemoryStr}"`));
+                    }
+                    alert("故事線已完全復活！🌸");
+                    window.location.reload();
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("雖然找到了故事殘留，但解碼失敗。為你切換至「文字結構深度打撈」...");
+                reconstructFromHTML(rawText);
+            }
+            input.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    // 備用救援方案：如果快取被洗掉，直接從網頁渲染出來的對話區塊（HTML）硬把文字幹回來
+    function reconstructFromHTML(htmlContent) {
+        try {
+            // 解析出所有對話訊息
+            let userMsgs = [...htmlContent.matchAll(/class="message user-message"[^>]*>([\s\S]*?)<\/div>/g)].map(m => m[1].trim());
+            let aiMsgs = [...htmlContent.matchAll(/class="message ai-message[^"]*"[^>]*>([\s\S]*?)<\/div>/g)].map(m => m[1].trim());
+            
+            // 去除首個AI歡迎詞
+            if (aiMsgs.length > 0 && aiMsgs[0].includes("你想讓我陪你創作什麼樣的故事")) {
+                aiMsgs.shift();
+            }
+
+            if (userMsgs.length === 0 && aiMsgs.length === 0) {
+                alert("救援失敗：這個檔案裡找不到任何之前留下的對話痕跡。");
+                return;
+            }
+
+            let rebuiltMessages = [];
+            let maxLength = Math.max(userMsgs.length, aiMsgs.length);
+            
+            for(let i=0; i<maxLength; i++) {
+                if(userMsgs[i]) {
+                    rebuiltMessages.push({ type: 'user', text: userMsgs[i] });
+                }
+                if(aiMsgs[i]) {
+                    rebuiltMessages.push({ type: 'ai', versions: [aiMsgs[i]], activeIndex: 0 });
+                }
+            }
+
+            if (confirm(`🌟 局部打撈成功！成功從畫面結構中救回了 ${rebuiltMessages.length} 條對話！\n是否要將這些對話匯入成一個獨立的「🩹 深度打撈救援故事線」？`)) {
+                let savedRooms = localStorage.getItem('pink_chat_rooms_v3');
+                let localRooms = savedRooms ? JSON.parse(savedRooms) : {};
+                
+                const rescueId = 'rescue-' + Date.now();
+                localRooms[rescueId] = {
+                    name: "🩹 深度打撈救援故事線",
+                    messages: rebuiltMessages
+                };
+                
+                localStorage.setItem('pink_chat_rooms_v3', JSON.stringify(localRooms));
+                alert("救援房間已成功插入！🌸");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error(e);
+            alert("深度打撈失敗，這個檔案可能毀損或未包含對話文字。");
+        }
+    }
 </script>
 
 </body>
