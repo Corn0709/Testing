@@ -217,7 +217,9 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .model-select {
@@ -237,11 +239,11 @@
             background-color: var(--pink-light);
         }
 
-        .btn-config-key {
+        .btn-config-key, .btn-export-chat, .btn-data-transfer {
             background: var(--bg-white);
             color: var(--pink-dark);
             border: 1px solid var(--pink-primary);
-            padding: 5px 12px;
+            padding: 5px 10px;
             border-radius: 15px;
             font-size: 12px;
             cursor: pointer;
@@ -249,7 +251,7 @@
             transition: all 0.2s;
         }
 
-        .btn-config-key:hover {
+        .btn-config-key:hover, .btn-export-chat:hover, .btn-data-transfer:hover {
             background: var(--pink-light);
             transform: translateY(-1px);
         }
@@ -492,7 +494,7 @@
             .app-container { flex-direction: column; }
             .sidebar { width: 100%; height: 32vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.4); }
             .main-chat { height: 60vh; }
-            .header-right { gap: 8px; }
+            .header-right { gap: 6px; }
         }
     </style>
 </head>
@@ -528,6 +530,9 @@
                     <option value="gemini-3.1-flash-lite">Gemini 3.1 Lite (救援)</option>
                     <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
                 </select>
+                <button class="btn-export-chat" onclick="exportCurrentChat()" title="下載為TXT文字檔">📥 導出文本</button>
+                <button class="btn-data-transfer" onclick="backupAllData()" title="複製全站資料代碼">📦 備份進度</button>
+                <button class="btn-data-transfer" onclick="restoreAllData()" title="貼上代碼還原全站資料">🚀 還原進度</button>
                 <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
             </div>
         </div>
@@ -547,7 +552,6 @@
 </div>
 
 <script>
-    // 基礎格式防護指令
     const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
 
     let rooms = {};
@@ -555,7 +559,6 @@
     let isProcessing = false;
     let selectedModel = 'gemini-2.5-flash';
 
-    // 建立每次傳送給 Google 的整合指令（融合基礎指令與記憶庫內容）
     function getCombinedSystemInstruction() {
         const memoryText = localStorage.getItem('pink_writer_memory') || '';
         if (memoryText.trim()) {
@@ -625,7 +628,7 @@
             const defaultId = 'room-' + Date.now();
             rooms[defaultId] = {
                 name: "🌸 新的小說劇本",
-                messages: [] // 乾淨存放使用者的對話紀錄
+                messages: []
             };
         }
         
@@ -732,7 +735,6 @@
                 if (msg.type === 'user') {
                     appendMessageNode(msg.text, 'user', idx);
                 } else if (msg.type === 'ai') {
-                    // 取出目前被選取的分支版本文字
                     const activeVersionIndex = msg.activeIndex || 0;
                     const textToShow = msg.versions[activeVersionIndex] || "（無回應）";
                     appendMessageNode(textToShow, 'ai', idx);
@@ -770,7 +772,6 @@
                 refreshBtn.onclick = () => requestNewBranch(index);
                 actionsDiv.appendChild(refreshBtn);
 
-                // 如果這則 AI 回應有多個分支，顯示版本切換按鈕
                 const msgData = rooms[currentRoomId].messages[index];
                 if (msgData && msgData.versions && msgData.versions.length > 1) {
                     const switcher = document.createElement('div');
@@ -833,7 +834,6 @@
             return;
         }
 
-        // 當修改了過去的某個 User 提示時，砍掉之後的所有對話重新出發
         rooms[currentRoomId].messages.splice(index + 1);
         rooms[currentRoomId].messages[index].text = newText;
 
@@ -844,7 +844,6 @@
 
     async function requestNewBranch(aiMsgIndex) {
         if (isProcessing) return;
-        // 把目標 AI 訊息之後的所有對話暫時切掉，只保留到這一步
         rooms[currentRoomId].messages.splice(aiMsgIndex + 1);
         saveRoomsToStorage();
         
@@ -876,12 +875,9 @@
         await fetchAIResponse();
     }
 
-    // 將我們的乾淨歷史紀錄，打包轉譯成 Google 規定的 API 連線陣列
     function buildApiContents(targetAiIndex = -1) {
         const list = rooms[currentRoomId].messages;
         let apiContents = [];
-        
-        // 限制長度，只打包到目前需要運算的位置
         let limit = targetAiIndex === -1 ? list.length : targetAiIndex;
 
         for (let i = 0; i < limit; i++) {
@@ -918,11 +914,9 @@
         chatBox.appendChild(loadingContainer);
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // 轉換出符合官方規則的歷史紀錄陣列
         let apiHistory = buildApiContents(isRefreshingIndex);
 
         try {
-            // 建構傳輸請求體，並將記憶庫防護指令強制注入給 systemInstruction 欄位
             const requestBody = {
                 contents: apiHistory,
                 systemInstruction: {
@@ -949,14 +943,12 @@
             const aiText = data.candidates[0].content.parts[0].text;
 
             if (isRefreshingIndex === -1) {
-                // 全新對話：建立新的 AI 訊息物件與分支
                 rooms[currentRoomId].messages.push({
                     type: 'ai',
                     versions: [aiText],
                     activeIndex: 0
                 });
             } else {
-                // 刷新對話：在原有的 AI 訊息物件中追加新分支，並跳到最新版本
                 const existingAiMsg = rooms[currentRoomId].messages[isRefreshingIndex];
                 existingAiMsg.versions.push(aiText);
                 existingAiMsg.activeIndex = existingAiMsg.versions.length - 1;
@@ -970,6 +962,96 @@
         } finally {
             isProcessing = false;
             renderChatBox();
+        }
+    }
+
+    function exportCurrentChat() {
+        if (!currentRoomId || !rooms[currentRoomId]) {
+            alert("沒有選取任何故事線，無法匯出喔！");
+            return;
+        }
+
+        const room = rooms[currentRoomId];
+        const memoryText = localStorage.getItem('pink_writer_memory') || '（目前無設定）';
+        
+        let fileContent = `=========================================\n`;
+        fileContent += `🌸 故事劇本線：${room.name}\n`;
+        fileContent += `🧠 當時使用的全域設定記憶庫：\n${memoryText.trim()}\n`;
+        fileContent += `=========================================\n\n`;
+
+        if (room.messages.length === 0) {
+            fileContent += `（當前房間尚未開始對話）\n`;
+        } else {
+            room.messages.forEach((msg, idx) => {
+                if (msg.type === 'user') {
+                    fileContent += `【作者提示】\n${msg.text}\n\n`;
+                } else if (msg.type === 'ai') {
+                    const activeIndex = msg.activeIndex || 0;
+                    const text = msg.versions[activeIndex] || '';
+                    fileContent += `【AI 創作】\n${text}\n\n`;
+                    fileContent += `-----------------------------------------\n\n`;
+                }
+            });
+        }
+
+        const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        
+        const safeName = room.name.replace(/[\\/:*?"<>|]/g, "");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${safeName}_對話備份.txt`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 平板專用手動備份：打包所有資料並生成文字彈窗
+    function backupAllData() {
+        const dataPackage = {
+            rooms: localStorage.getItem('pink_chat_rooms_v3') || '[]',
+            memory: localStorage.getItem('pink_writer_memory') || ''
+        };
+        
+        // 將包裝好的物件轉為 Base64 字串，方便平板全選複製
+        const code = btoa(encodeURIComponent(JSON.stringify(dataPackage)));
+        
+        // 建立一個臨時文字框讓使用者在平板上方便選取
+        const check = confirm("已成功為你封裝全站的故事劇本與記憶庫！\n點擊「確定」後，將會自動把這串『進度代碼』複製到你的剪貼簿。\n\n你可以把它貼到平板的備忘錄裡存起來。未來若換裝置，只要貼回還原即可。");
+        if (check) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert("進度代碼已成功複製到剪貼簿囉！🌸");
+            }).catch(err => {
+                // 如果瀏覽器不支援自動複製，則用 prompt 讓使用者手動選取
+                prompt("由於瀏覽器限制，請手動全選下方輸入框內的代碼並複製：", code);
+            });
+        }
+    }
+
+    // 平板專用手動還原：輸入進度代碼一鍵還原
+    function restoreAllData() {
+        const code = prompt("請貼上你之前備份的『進度代碼』：");
+        if (!code) return;
+
+        try {
+            const decodedJson = decodeURIComponent(atob(code.trim()));
+            const parsedData = JSON.parse(decodedJson);
+            
+            if (parsedData.rooms) {
+                if (confirm("這將會覆蓋你目前平板上所有的聊天室與故事記憶庫喔！確定要還原嗎？")) {
+                    localStorage.setItem('pink_chat_rooms_v3', parsedData.rooms);
+                    localStorage.setItem('pink_writer_memory', parsedData.memory || '');
+                    alert("還原成功！系統即將重新載入故事...🌸");
+                    window.location.reload();
+                }
+            } else {
+                alert("錯誤：這似乎不是有效的備份代碼。");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("還原失敗！請檢查代碼是否複製完整，或者格式有沒有缺漏。");
         }
     }
 
