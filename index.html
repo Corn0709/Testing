@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的專屬 AI 寫作閨房</title>
+    <title>我的專專屬 AI 寫作閨房</title>
     <style>
         :root {
             --pink-primary: #ffb6c1; 
@@ -531,8 +531,11 @@
                     <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
                 </select>
                 <button class="btn-export-chat" onclick="exportCurrentChat()" title="下載為TXT文字檔">📥 導出文本</button>
-                <button class="btn-data-transfer" onclick="backupAllData()" title="複製全站資料代碼">📦 備份進度</button>
-                <button class="btn-data-transfer" onclick="restoreAllData()" title="貼上代碼還原全站資料">🚀 還原進度</button>
+                <button class="btn-data-transfer" onclick="downloadAllDataBackup()" title="將所有資料下載為檔案備份">📦 備份進度檔案</button>
+                
+                <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="handleRestoreFile(this)">
+                <button class="btn-data-transfer" onclick="triggerRestoreFileInput()" title="上傳備份檔案還原全站資料">🚀 還原進度檔案</button>
+                
                 <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
             </div>
         </div>
@@ -1008,51 +1011,58 @@
         document.body.removeChild(link);
     }
 
-    // 平板專用手動備份：打包所有資料並生成文字彈窗
-    function backupAllData() {
+    // 全新優化：平板免複製！直接下載成備份檔案
+    function downloadAllDataBackup() {
         const dataPackage = {
             rooms: localStorage.getItem('pink_chat_rooms_v3') || '[]',
             memory: localStorage.getItem('pink_writer_memory') || ''
         };
         
-        // 將包裝好的物件轉為 Base64 字串，方便平板全選複製
-        const code = btoa(encodeURIComponent(JSON.stringify(dataPackage)));
+        const blob = new Blob([JSON.stringify(dataPackage, null, 2)], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
         
-        // 建立一個臨時文字框讓使用者在平板上方便選取
-        const check = confirm("已成功為你封裝全站的故事劇本與記憶庫！\n點擊「確定」後，將會自動把這串『進度代碼』複製到你的剪貼簿。\n\n你可以把它貼到平板的備忘錄裡存起來。未來若換裝置，只要貼回還原即可。");
-        if (check) {
-            navigator.clipboard.writeText(code).then(() => {
-                alert("進度代碼已成功複製到剪貼簿囉！🌸");
-            }).catch(err => {
-                // 如果瀏覽器不支援自動複製，則用 prompt 讓使用者手動選取
-                prompt("由於瀏覽器限制，請手動全選下方輸入框內的代碼並複製：", code);
-            });
-        }
+        link.setAttribute("href", url);
+        link.setAttribute("download", `pink_writer_backup.json`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
-    // 平板專用手動還原：輸入進度代碼一鍵還原
-    function restoreAllData() {
-        const code = prompt("請貼上你之前備份的『進度代碼』：");
-        if (!code) return;
+    // 觸發隱藏的檔案上傳點
+    function triggerRestoreFileInput() {
+        document.getElementById('restore-file-input').click();
+    }
 
-        try {
-            const decodedJson = decodeURIComponent(atob(code.trim()));
-            const parsedData = JSON.parse(decodedJson);
-            
-            if (parsedData.rooms) {
-                if (confirm("這將會覆蓋你目前平板上所有的聊天室與故事記憶庫喔！確定要還原嗎？")) {
-                    localStorage.setItem('pink_chat_rooms_v3', parsedData.rooms);
-                    localStorage.setItem('pink_writer_memory', parsedData.memory || '');
-                    alert("還原成功！系統即將重新載入故事...🌸");
-                    window.location.reload();
+    // 讀取上傳的檔案並直接還原資料
+    function handleRestoreFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsedData = JSON.parse(e.target.result);
+                if (parsedData.rooms) {
+                    if (confirm("偵測到有效的備份檔案！這將會覆蓋目前網頁上的所有故事線與記憶庫，確定要載入還原嗎？")) {
+                        localStorage.setItem('pink_chat_rooms_v3', parsedData.rooms);
+                        localStorage.setItem('pink_writer_memory', parsedData.memory || '');
+                        alert("還原成功！正在為你載入故事...🌸");
+                        window.location.reload();
+                    }
+                } else {
+                    alert("載入失敗：此檔案格式不正確，並非本寫作室專用的備份檔。");
                 }
-            } else {
-                alert("錯誤：這似乎不是有效的備份代碼。");
+            } catch (err) {
+                console.error(err);
+                alert("檔案讀取發生錯誤，請確認上傳的是正確的備份 .json 檔案。");
             }
-        } catch (e) {
-            console.error(e);
-            alert("還原失敗！請檢查代碼是否複製完整，或者格式有沒有缺漏。");
-        }
+            // 清空選擇，讓同一個檔案能重複觸發
+            input.value = '';
+        };
+        reader.readAsText(file);
     }
 
     window.addEventListener('DOMContentLoaded', loadAppInitialization);
