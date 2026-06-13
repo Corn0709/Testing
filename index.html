@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的專屬 AI 寫作閨房</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的專專屬 AI 寫作閨房</title>
     <style>
         :root {
             --pink-primary: #ffb6c1; 
@@ -11,7 +11,7 @@
             --pink-dark: #ff8da1;    
             --bg-white: #ffffff;
             --text-main: #4a4a4a;
-            --sidebar-width: 280px;
+            --sidebar-width: 290px;
             --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -19,6 +19,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -29,6 +30,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            height: -webkit-fill-available;
             padding: 15px;
             overflow: hidden;
         }
@@ -40,6 +42,7 @@
             height: 94vh;
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 24px;
             box-shadow: 0 12px 40px rgba(255, 182, 193, 0.35);
             border: 1px solid rgba(255, 255, 255, 0.7);
@@ -49,19 +52,19 @@
         }
 
         @keyframes appSpawn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            from { opacity: 0; transform: scale(0.96) translateY(12px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* 可伸縮側邊欄 */
+        /* 側邊欄電腦與平板模式 */
         .sidebar {
             width: var(--sidebar-width);
             background: linear-gradient(180deg, rgba(255, 240, 242, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
             border-right: 1px solid rgba(255, 182, 193, 0.3);
             display: flex;
             flex-direction: column;
-            padding: 20px 15px;
-            gap: 15px;
+            padding: 24px 18px;
+            gap: 16px;
             transition: var(--transition-smooth);
             overflow: hidden;
             flex-shrink: 0;
@@ -70,17 +73,16 @@
 
         .sidebar.collapsed {
             width: 0;
-            padding: 20px 0;
+            padding: 24px 0;
             border-right: none;
         }
 
-        /* 收縮控制鈕 */
         .sidebar-toggle-btn {
             position: absolute;
-            left: 10px;
-            bottom: 20px;
-            width: 36px;
-            height: 36px;
+            left: 12px;
+            bottom: 24px;
+            width: 38px;
+            height: 38px;
             background: var(--bg-white);
             border: 1px solid rgba(255, 182, 193, 0.5);
             border-radius: 50%;
@@ -88,7 +90,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             z-index: 10;
             transition: var(--transition-smooth);
         }
@@ -96,32 +98,6 @@
         .sidebar-toggle-btn:hover {
             transform: scale(1.1);
             background: var(--pink-light);
-        }
-
-        .sidebar.collapsed + .main-chat .floating-toggle {
-            display: flex;
-        }
-
-        .floating-toggle {
-            position: absolute;
-            left: 15px;
-            bottom: 25px;
-            width: 40px;
-            height: 40px;
-            background: var(--bg-white);
-            border: 1px solid var(--pink-primary);
-            border-radius: 50%;
-            cursor: pointer;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
-            z-index: 99;
-            animation: bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes bounceIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
         }
 
         .sidebar-title {
@@ -257,7 +233,7 @@
             border-color: var(--pink-primary);
         }
 
-        /* 主對話視窗 */
+        /* 主對話主體 */
         .main-chat {
             flex: 1;
             display: flex;
@@ -266,27 +242,70 @@
             position: relative;
         }
 
-        /* 頂部排版優化 */
+        .floating-toggle {
+            position: absolute;
+            left: 15px;
+            bottom: 25px;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-white);
+            border: 1px solid var(--pink-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 14px rgba(255, 182, 193, 0.45);
+            z-index: 99;
+            animation: bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sidebar.collapsed + .main-chat .floating-toggle {
+            display: flex;
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* 頂部控制欄 */
         .chat-header {
-            padding: 15px 25px;
+            padding: 15px 24px;
             border-bottom: 1px solid #f8f8f8;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #ffffff;
             z-index: 5;
+            gap: 10px;
+        }
+
+        /* 行動端專用呼叫側欄按鈕 */
+        .mobile-menu-trigger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--pink-dark);
+            padding: 5px;
         }
 
         .current-room-title {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 600;
             color: #555;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-grow: 1;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .model-select {
@@ -302,10 +321,6 @@
             transition: var(--transition-smooth);
         }
 
-        .model-select:hover {
-            background-color: var(--pink-light);
-        }
-
         .btn-config-key {
             background: var(--bg-white);
             color: var(--pink-dark);
@@ -318,12 +333,11 @@
             transition: var(--transition-smooth);
         }
 
-        .btn-config-key:hover {
+        .btn-config-key:hover, .model-select:hover {
             background: var(--pink-light);
-            transform: translateY(-1px);
         }
 
-        /* 「三」形狀的漢堡選單 */
+        /* 漢堡選單 */
         .burger-menu-container {
             position: relative;
         }
@@ -340,9 +354,7 @@
             transition: var(--transition-smooth);
         }
 
-        .burger-btn:hover {
-            background: var(--pink-light);
-        }
+        .burger-btn:hover { background: var(--pink-light); }
 
         .burger-btn span {
             display: block;
@@ -350,7 +362,6 @@
             height: 2px;
             background-color: var(--pink-dark);
             border-radius: 2px;
-            transition: 0.3s;
         }
 
         .dropdown-menu {
@@ -363,7 +374,7 @@
             box-shadow: 0 10px 25px rgba(255, 182, 193, 0.25);
             display: none;
             flex-direction: column;
-            min-width: 150px;
+            min-width: 170px;
             overflow: hidden;
             z-index: 100;
             transform-origin: top right;
@@ -392,7 +403,7 @@
             color: var(--pink-dark);
         }
 
-        /* 歷史對話盒子 */
+        /* 對話歷史區 */
         .chat-box {
             flex-grow: 1;
             padding: 25px;
@@ -447,6 +458,7 @@
             gap: 10px;
             margin-top: 8px;
             padding: 0 4px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -468,10 +480,8 @@
         .action-btn:hover {
             background-color: var(--pink-dark);
             transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(255, 141, 161, 0.4);
         }
 
-        /* 前後版本切換器 */
         .version-switcher {
             display: flex;
             align-items: center;
@@ -490,7 +500,6 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 11px;
-            transition: 0.2s;
         }
 
         .version-arrow:disabled {
@@ -498,7 +507,7 @@
             cursor: not-allowed;
         }
 
-        /* 正在整理新靈感的閃爍框 */
+        /* 正在推敲靈魂框 */
         .loading-pulse {
             background: linear-gradient(90deg, #ffffff 0%, #fff0f2 50%, #ffffff 100%);
             background-size: 200% 100%;
@@ -513,7 +522,7 @@
 
         .edit-textarea {
             width: 100%;
-            min-width: 320px;
+            min-width: 260px;
             min-height: 85px;
             padding: 12px;
             border: 1px solid var(--pink-primary);
@@ -537,21 +546,19 @@
             font-size: 13px;
             cursor: pointer;
             border: none;
-            transition: 0.2s;
         }
 
         .btn-edit-save { background: var(--pink-primary); color: white; }
-        .btn-edit-save:hover { background: var(--pink-dark); }
         .btn-edit-cancel { background: #eee; color: #666; }
 
         /* 底欄輸入區 */
         .input-area {
-            padding: 18px 25px;
+            padding: 18px 24px;
             background: var(--bg-white);
             border-top: 1px solid #f8f8f8;
             display: flex;
             align-items: flex-end;
-            gap: 15px;
+            gap: 12px;
         }
 
         .chat-input {
@@ -596,29 +603,90 @@
         .btn-send:hover {
             background: var(--pink-dark);
             transform: scale(1.08) rotate(-5deg);
-            box-shadow: 0 7px 16px rgba(255, 141, 161, 0.55);
         }
 
-        .btn-send:active { transform: scale(0.95); }
-
-        .chat-box::-webkit-scrollbar, .room-list::-webkit-scrollbar, .chat-input::-webkit-scrollbar {
-            width: 5px;
-        }
-        .chat-box::-webkit-scrollbar-thumb, .room-list::-webkit-scrollbar-thumb, .chat-input::-webkit-scrollbar-thumb {
-            background: #eaeaea;
-            border-radius: 10px;
-        }
-
+        /* 手機行動端網頁自適應穿透樣式 (重頭戲) */
         @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
-            .sidebar { width: 100% !important; height: 35vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.3); }
-            .sidebar.collapsed { height: 0; padding: 0; }
-            .main-chat { height: 65vh; }
-            .sidebar-toggle-btn { display: none; }
+            body { padding: 0; }
+            .app-container { height: 100vh; border-radius: 0; border: none; }
+            
+            /* 手機版側欄轉化為底部抽屜式 */
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100% !important;
+                height: 75vh;
+                background: rgba(255, 255, 255, 0.96);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                z-index: 999;
+                border-right: none;
+                border-top: 1px solid rgba(255, 182, 193, 0.4);
+                border-radius: 24px 24px 0 0;
+                transform: translateY(100%);
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+                padding: 25px 20px;
+            }
+            
+            .sidebar.active-mobile {
+                transform: translateY(0);
+            }
+
+            .sidebar-toggle-btn {
+                display: none;
+            }
+
+            /* 手機版遮罩 */
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.2);
+                z-index: 998;
+                display: none;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            /* 頂欄微調 */
+            .mobile-menu-trigger {
+                display: block;
+            }
+            .chat-header {
+                padding: 12px 16px;
+            }
+            .current-room-title {
+                font-size: 15px;
+            }
+            .header-right {
+                gap: 6px;
+            }
+            .model-select {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+            .btn-config-key {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .chat-box { padding: 15px; gap: 18px; }
+            .message-container { max-width: 90%; }
+            .message { font-size: 14px; padding: 11px 15px; }
+            .input-area { padding: 12px 16px; }
         }
     </style>
 </head>
 <body>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <div class="app-container">
     
@@ -646,7 +714,14 @@
         <button class="floating-toggle" onclick="toggleSidebar()" title="展開側欄">▶</button>
 
         <div class="chat-header">
+            <button class="mobile-menu-trigger" onclick="openMobileSidebar()" title="打開故事列表">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M4 6h16M4 12h16M4 18h7"/>
+                </svg>
+            </button>
+
             <div class="current-room-title" id="current-room-title">請選擇故事線</div>
+            
             <div class="header-right">
                 <select class="model-select" id="model-selector" onchange="changeModel()">
                     <option value="gemini-3.1-flash-lite">Gemini 3.1 Lite (預設)</option>
@@ -678,7 +753,7 @@
         <div class="input-area">
             <textarea class="chat-input" id="chat-input" placeholder="對 AI 傾訴新靈感... (Enter 送出 / Shift+Enter 換行)" onkeydown="handleKeyDown(event)" oninput="autoResizeInput(this)"></textarea>
             <button class="btn-send" onclick="sendMessage()" title="發送">
-                <svg viewBox="0 0 24 24" fill="white" width="22px" height="22px">
+                <svg viewBox="0 0 24 24" fill="white" width="20px" height="20px">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                 </svg>
             </button>
@@ -688,13 +763,25 @@
 </div>
 
 <script>
-    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
+    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用 any 標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
 
     let rooms = {};
     let currentRoomId = null;
     let isProcessing = false;
     let selectedModel = 'gemini-3.1-flash-lite';
 
+    /* 手機版側欄喚醒 */
+    function openMobileSidebar() {
+        document.getElementById('sidebar').classList.add('active-mobile');
+        document.getElementById('sidebar-overlay').classList.add('active');
+    }
+
+    function closeMobileSidebar() {
+        document.getElementById('sidebar').classList.remove('active-mobile');
+        document.getElementById('sidebar-overlay').classList.remove('active');
+    }
+
+    /* 桌機與平板收縮功能 */
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.querySelector('.sidebar-toggle-btn');
@@ -717,7 +804,8 @@
     });
 
     function handleKeyDown(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        // 在非手機環境下，Enter直接發送，手機端保留原本鍵盤按鈕
+        if (window.innerWidth > 768 && e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
@@ -777,14 +865,12 @@
         const savedModel = localStorage.getItem('pink_writer_model') || 'gemini-3.1-flash-lite';
         selectedModel = savedModel;
         document.getElementById('model-selector').value = selectedModel;
-
         document.getElementById('memory-input').value = localStorage.getItem('pink_writer_memory') || '';
 
         const savedRooms = localStorage.getItem('pink_chat_rooms_v3');
         if (savedRooms) {
             rooms = JSON.parse(savedRooms);
         } else {
-            // 預設聊天室設定
             const defaultId = 'room-default';
             rooms[defaultId] = {
                 name: "🌸 預設小說劇本線",
@@ -831,6 +917,7 @@
         saveRoomsToStorage();
         renderSidebar();
         renderChatBox();
+        closeMobileSidebar();
     }
 
     function renameRoom(event, id) {
@@ -852,6 +939,7 @@
         currentRoomId = id;
         renderSidebar();
         renderChatBox();
+        closeMobileSidebar();
     }
 
     function deleteRoom(event, id) {
@@ -860,7 +948,7 @@
             alert("保留最後一條故事線，才能留住靈魂喔！");
             return;
         }
-        if (confirm(`確定要將「${rooms[id].name}」化為灰燼嗎？這無法還原喔！`)) {
+        if (confirm(`確定要將「${rooms[id].name}」化為灰燼嗎？`)) {
             delete rooms[id];
             if (currentRoomId === id) {
                 currentRoomId = Object.keys(rooms)[0];
@@ -885,7 +973,7 @@
         const messages = rooms[currentRoomId].messages;
 
         if (messages.length === 0) {
-            appendMessageNode("準備好了，你想讓我陪你撰寫什麼樣的虛構小說情節？", 'ai', -1);
+            appendMessageNode({ versions: ["準備好了，你想讓我陪你撰寫什麼樣的虛構小說情節？"], activeIndex: 0 }, 'ai', -1);
         } else {
             messages.forEach((msg, idx) => {
                 appendMessageNode(msg, msg.type, idx);
@@ -903,23 +991,13 @@
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${type === 'user' ? 'user-message' : 'ai-message'}`;
 
-        // 動態判定要展示哪一個版本
         let textToShow = "";
         let activeIdx = 0;
         let totalVersions = 1;
 
-        if (type === 'user') {
-            if (typeof msgData === 'string') {
-                textToShow = msgData;
-                // 相容舊資料格式，自動升級為多版本物件
-                rooms[currentRoomId].messages[index] = { type: 'user', versions: [msgData], activeIndex: 0 };
-                activeIdx = 0;
-                totalVersions = 1;
-            } else {
-                activeIdx = msgData.activeIndex || 0;
-                textToShow = msgData.versions[activeIdx] || "";
-                totalVersions = msgData.versions.length;
-            }
+        if (typeof msgData === 'string') {
+            textToShow = msgData;
+            rooms[currentRoomId].messages[index] = { type: type, versions: [msgData], activeIndex: 0 };
         } else {
             activeIdx = msgData.activeIndex || 0;
             textToShow = msgData.versions[activeIdx] || "";
@@ -947,7 +1025,6 @@
                 actionsDiv.appendChild(refreshBtn);
             }
 
-            // 無論是用戶提示還是AI回應，只要版本大於1，均顯示前後頁面切換紐
             if (totalVersions > 1) {
                 const switcher = document.createElement('div');
                 switcher.className = 'version-switcher';
@@ -972,10 +1049,8 @@
                 switcher.appendChild(rightBtn);
                 actionsDiv.appendChild(switcher);
             }
-            
             container.appendChild(actionsDiv);
         }
-
         chatBox.appendChild(container);
     }
 
@@ -1008,13 +1083,10 @@
         }
 
         const msgObj = rooms[currentRoomId].messages[index];
-        // 增加新的提示分支，而不洗掉舊的紀錄
         msgObj.versions.push(newText);
         msgObj.activeIndex = msgObj.versions.length - 1;
 
-        // 砍掉舊分支後面的所有對話
         rooms[currentRoomId].messages.splice(index + 1);
-
         saveRoomsToStorage();
         renderChatBox();
         await fetchAIResponse();
@@ -1022,11 +1094,8 @@
 
     async function requestNewBranch(aiMsgIndex) {
         if (isProcessing) return;
-        
-        // 刷新回應時，只將此回應後的對話清除
         rooms[currentRoomId].messages.splice(aiMsgIndex + 1);
         saveRoomsToStorage();
-        
         await fetchAIResponse(aiMsgIndex);
     }
 
@@ -1077,13 +1146,10 @@
 
         isProcessing = true;
         const chatBox = document.getElementById('chat-box');
-        
-        let loadingContainer;
         let loadingMsg;
 
-        // 刷新回應：如果是在既有的AI位置刷新，將原位置渲染成正在刷新的狀態
         if (isRefreshingIndex !== -1) {
-            renderChatBox(); // 刷回乾淨狀態
+            renderChatBox();
             const containerToReplace = document.getElementById(`msg-container-${isRefreshingIndex}`);
             if (containerToReplace) {
                 loadingMsg = containerToReplace.querySelector('.message');
@@ -1091,8 +1157,7 @@
                 loadingMsg.innerText = '正在重新推敲新章節...🌸';
             }
         } else {
-            // 普通發送：在尾端追加閃爍特效框
-            loadingContainer = document.createElement('div');
+            const loadingContainer = document.createElement('div');
             loadingContainer.className = 'message-container ai';
             loadingMsg = document.createElement('div');
             loadingMsg.className = 'message ai-message loading-pulse';
@@ -1118,12 +1183,12 @@
 
             if (!response.ok) {
                 const errData = await response.json();
-                throw new Error(errData.error?.message || "線路塞車中");
+                throw new Error(errData.error?.message || "線路忙碌中");
             }
 
             const data = await response.json();
             if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
-                throw new Error("模型空回，可能是字詞觸發了後台審查機制。");
+                throw new Error("模型未吐回正常文本。");
             }
             
             const aiText = data.candidates[0].content.parts[0].text;
@@ -1154,7 +1219,6 @@
         if (!currentRoomId || !rooms[currentRoomId]) return;
         const room = rooms[currentRoomId];
         const memoryText = localStorage.getItem('pink_writer_memory') || '（當前無全域設定）';
-        
         let fileContent = `=========================================\n🌸 故事劇本線：${room.name}\n🧠 記憶設定備忘：\n${memoryText.trim()}\n=========================================\n\n`;
 
         room.messages.forEach(msg => {
@@ -1208,15 +1272,13 @@
                     if (confirm("這會完全覆蓋當前所有房間的進度，確定匯入嗎？")) {
                         localStorage.setItem('pink_chat_rooms_v3', parsedData.rooms);
                         localStorage.setItem('pink_writer_memory', parsedData.memory || '');
-                        alert("還原大成功！");
+                        alert("還原成功！");
                         window.location.reload();
                     }
                 } else {
                     alert("格式不符，請上傳正確的 .json 備份檔案。");
                 }
-            } catch (err) {
-                alert("檔案讀取發生錯誤。");
-            }
+            } catch (err) { alert("檔案讀取失敗。"); }
             input.value = '';
         };
         reader.readAsText(file);
