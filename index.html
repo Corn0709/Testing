@@ -11,6 +11,8 @@
             --pink-dark: #ff8da1;    
             --bg-white: #ffffff;
             --text-main: #4a4a4a;
+            --sidebar-width: 280px;
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         * {
@@ -27,64 +29,128 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            padding: 10px;
+            padding: 15px;
+            overflow: hidden;
         }
 
         .app-container {
             display: flex;
             width: 100%;
-            max-width: 1000px;
-            height: 92vh;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            max-width: 1100px;
+            height: 94vh;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(255, 182, 193, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             overflow: hidden;
-            animation: appSpawn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            position: relative;
+            animation: appSpawn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         @keyframes appSpawn {
-            from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
+        /* 可伸縮側邊欄 */
         .sidebar {
-            width: 280px;
-            background: rgba(255, 240, 242, 0.7);
-            border-right: 1px solid rgba(255, 182, 193, 0.4);
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, rgba(255, 240, 242, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+            border-right: 1px solid rgba(255, 182, 193, 0.3);
             display: flex;
             flex-direction: column;
-            padding: 15px;
-            gap: 10px;
+            padding: 20px 15px;
+            gap: 15px;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 20px 0;
+            border-right: none;
+        }
+
+        /* 收縮控制鈕 */
+        .sidebar-toggle-btn {
+            position: absolute;
+            left: 10px;
+            bottom: 20px;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-white);
+            border: 1px solid rgba(255, 182, 193, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-toggle-btn:hover {
+            transform: scale(1.1);
+            background: var(--pink-light);
+        }
+
+        .sidebar.collapsed + .main-chat .floating-toggle {
+            display: flex;
+        }
+
+        .floating-toggle {
+            position: absolute;
+            left: 15px;
+            bottom: 25px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-white);
+            border: 1px solid var(--pink-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
+            z-index: 99;
+            animation: bounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes bounceIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
         }
 
         .sidebar-title {
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--pink-dark);
-            margin-bottom: 5px;
             text-align: center;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         .btn-add-room {
             background: var(--bg-white);
             color: var(--pink-dark);
             border: 2px dashed var(--pink-primary);
-            padding: 10px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition-smooth);
             text-align: center;
+            white-space: nowrap;
         }
 
         .btn-add-room:hover {
             background: var(--pink-primary);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4);
+            box-shadow: 0 6px 15px rgba(255, 182, 193, 0.4);
         }
 
         .room-list {
@@ -92,27 +158,25 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            padding-right: 2px;
+            gap: 10px;
         }
 
         .room-item {
             background: var(--bg-white);
-            padding: 12px;
-            border-radius: 10px;
+            padding: 12px 15px;
+            border-radius: 12px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid transparent;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: var(--transition-smooth);
             font-size: 14px;
             gap: 5px;
         }
 
         .room-item:hover {
             background: #ffe3e7;
-            border-color: var(--pink-primary);
             transform: translateX(4px);
         }
 
@@ -121,7 +185,7 @@
             border-color: var(--pink-primary);
             font-weight: 500;
             transform: translateX(6px);
-            box-shadow: -4px 0 0 var(--pink-dark);
+            box-shadow: -5px 0 0 var(--pink-dark);
         }
 
         .room-name {
@@ -140,91 +204,94 @@
         .btn-room-action {
             background: none;
             border: none;
-            color: #aaa;
+            color: #ccc;
             cursor: pointer;
             font-size: 12px;
             padding: 2px 4px;
             transition: color 0.2s, transform 0.2s;
-            border-radius: 4px;
         }
 
         .btn-room-action:hover {
             color: var(--pink-dark);
-            transform: scale(1.15);
+            transform: scale(1.2);
         }
 
         .memory-vault {
             background: var(--bg-white);
-            border: 1px solid rgba(255, 182, 193, 0.5);
-            border-radius: 12px;
-            padding: 10px;
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            border-radius: 14px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.15);
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.12);
         }
 
         .memory-header {
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--pink-dark);
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            user-select: none;
+            white-space: nowrap;
         }
 
         .memory-textarea {
             width: 100%;
-            height: 90px;
-            padding: 8px;
-            border: 1px solid #eee;
-            border-radius: 8px;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #f2f2f2;
+            border-radius: 10px;
             font-size: 12px;
             resize: none;
             outline: none;
             font-family: inherit;
-            transition: border-color 0.2s;
+            transition: border-color 0.3s;
             display: none;
+            line-height: 1.4;
         }
 
         .memory-textarea:focus {
             border-color: var(--pink-primary);
         }
 
+        /* 主對話視窗 */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: var(--bg-white);
+            position: relative;
         }
 
+        /* 頂部排版優化 */
         .chat-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f5f5f5;
+            padding: 15px 25px;
+            border-bottom: 1px solid #f8f8f8;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #ffffff;
+            z-index: 5;
         }
 
         .current-room-title {
-            font-size: 18px;
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 600;
             color: #555;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
+            gap: 12px;
         }
 
         .model-select {
-            padding: 6px 10px;
-            border-radius: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
             border: 1px solid var(--pink-primary);
             background-color: var(--bg-white);
             color: var(--pink-dark);
@@ -232,71 +299,133 @@
             outline: none;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: var(--transition-smooth);
         }
 
         .model-select:hover {
             background-color: var(--pink-light);
         }
 
-        .btn-config-key, .btn-export-chat, .btn-data-transfer {
+        .btn-config-key {
             background: var(--bg-white);
             color: var(--pink-dark);
             border: 1px solid var(--pink-primary);
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: var(--transition-smooth);
         }
 
-        .btn-config-key:hover, .btn-export-chat:hover, .btn-data-transfer:hover {
+        .btn-config-key:hover {
             background: var(--pink-light);
             transform: translateY(-1px);
         }
 
-        .chat-box {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #fafafa;
+        /* 「三」形狀的漢堡選單 */
+        .burger-menu-container {
+            position: relative;
+        }
+
+        .burger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 5px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition-smooth);
+        }
+
+        .burger-btn:hover {
+            background: var(--pink-light);
+        }
+
+        .burger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background-color: var(--pink-dark);
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 42px;
+            background: var(--bg-white);
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.25);
+            display: none;
+            flex-direction: column;
+            min-width: 150px;
+            overflow: hidden;
+            z-index: 100;
+            transform-origin: top right;
+            animation: menuGrow 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes menuGrow {
+            from { opacity: 0; transform: scale(0.9) translateY(-5px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text-main);
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background: var(--pink-light);
+            color: var(--pink-dark);
+        }
+
+        /* 歷史對話盒子 */
+        .chat-box {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background-color: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
         .message-container {
             display: flex;
             flex-direction: column;
             max-width: 85%;
-            animation: msgSpawn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: msgSpawn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         @keyframes msgSpawn {
-            from { opacity: 0; transform: translateY(16px); }
+            from { opacity: 0; transform: translateY(18px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message-container.user {
-            align-self: flex-end;
-            align-items: flex-end;
-        }
-
-        .message-container.ai {
-            align-self: flex-start;
-            align-items: flex-start;
-        }
+        .message-container.user { align-self: flex-end; align-items: flex-end; }
+        .message-container.ai { align-self: flex-start; align-items: flex-start; }
 
         .message {
-            padding: 12px 16px;
-            border-radius: 18px;
+            padding: 14px 18px;
+            border-radius: 20px;
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
             word-break: break-all;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
             white-space: pre-wrap;
-            transition: box-shadow 0.2s;
         }
 
         .user-message {
@@ -309,14 +438,14 @@
             background-color: var(--bg-white);
             color: var(--text-main);
             border-bottom-left-radius: 4px;
-            border: 1px solid #f0f0f0;
+            border: 1px solid #f2f2f2;
         }
 
         .message-actions {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 6px;
+            margin-top: 8px;
             padding: 0 4px;
         }
 
@@ -324,33 +453,34 @@
             background-color: var(--pink-primary);
             color: white;
             border: none;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 12px;
+            border-radius: 14px;
             font-size: 11px;
             cursor: pointer;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 3px;
-            box-shadow: 0 2px 5px rgba(255, 182, 193, 0.4);
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 3px 6px rgba(255, 182, 193, 0.3);
+            transition: var(--transition-smooth);
         }
 
         .action-btn:hover {
             background-color: var(--pink-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(255, 141, 161, 0.5);
+            box-shadow: 0 5px 10px rgba(255, 141, 161, 0.4);
         }
 
+        /* 前後版本切換器 */
         .version-switcher {
             display: flex;
             align-items: center;
-            background: #f0f0f0;
-            padding: 2px 8px;
-            border-radius: 12px;
+            background: #f2f2f2;
+            padding: 3px 10px;
+            border-radius: 14px;
             font-size: 11px;
             color: #666;
-            gap: 5px;
+            gap: 6px;
         }
 
         .version-arrow {
@@ -359,8 +489,8 @@
             color: var(--pink-dark);
             cursor: pointer;
             font-weight: bold;
-            padding: 0 2px;
             font-size: 11px;
+            transition: 0.2s;
         }
 
         .version-arrow:disabled {
@@ -368,6 +498,7 @@
             cursor: not-allowed;
         }
 
+        /* 正在整理新靈感的閃爍框 */
         .loading-pulse {
             background: linear-gradient(90deg, #ffffff 0%, #fff0f2 50%, #ffffff 100%);
             background-size: 200% 100%;
@@ -382,17 +513,16 @@
 
         .edit-textarea {
             width: 100%;
-            min-width: 300px;
-            min-height: 80px;
-            padding: 10px;
+            min-width: 320px;
+            min-height: 85px;
+            padding: 12px;
             border: 1px solid var(--pink-primary);
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-family: inherit;
             outline: none;
             resize: vertical;
             margin-bottom: 8px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .edit-controls {
@@ -402,32 +532,23 @@
         }
 
         .btn-edit-save, .btn-edit-cancel {
-            padding: 6px 12px;
-            border-radius: 15px;
+            padding: 6px 14px;
+            border-radius: 16px;
             font-size: 13px;
             cursor: pointer;
             border: none;
-            transition: transform 0.2s;
+            transition: 0.2s;
         }
 
-        .btn-edit-save {
-            background: var(--pink-primary);
-            color: white;
-        }
+        .btn-edit-save { background: var(--pink-primary); color: white; }
+        .btn-edit-save:hover { background: var(--pink-dark); }
+        .btn-edit-cancel { background: #eee; color: #666; }
 
-        .btn-edit-save:hover { background: var(--pink-dark); transform: translateY(-1px); }
-
-        .btn-edit-cancel {
-            background: #eee;
-            color: #666;
-        }
-        
-        .btn-edit-cancel:hover { transform: translateY(-1px); }
-
+        /* 底欄輸入區 */
         .input-area {
-            padding: 15px 20px;
+            padding: 18px 25px;
             background: var(--bg-white);
-            border-top: 1px solid #f5f5f5;
+            border-top: 1px solid #f8f8f8;
             display: flex;
             align-items: flex-end;
             gap: 15px;
@@ -435,16 +556,16 @@
 
         .chat-input {
             flex-grow: 1;
-            padding: 12px 18px;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
+            padding: 14px 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 22px;
             font-size: 15px;
             outline: none;
-            transition: all 0.2s;
-            background: #fdfdfd;
+            transition: var(--transition-smooth);
+            background: #fbfbfb;
             resize: none;
-            height: 50px;
-            max-height: 150px;
+            height: 52px;
+            max-height: 160px;
             font-family: inherit;
             line-height: 1.5;
             overflow-y: auto;
@@ -453,48 +574,47 @@
         .chat-input:focus {
             border-color: var(--pink-primary);
             background: #ffffff;
-            box-shadow: 0 0 5px rgba(255, 182, 193, 0.5);
+            box-shadow: 0 0 8px rgba(255, 182, 193, 0.4);
         }
 
         .btn-send {
             background: var(--pink-primary);
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: var(--transition-smooth);
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5);
+            box-shadow: 0 5px 12px rgba(255, 182, 193, 0.5);
         }
 
         .btn-send:hover {
             background: var(--pink-dark);
             transform: scale(1.08) rotate(-5deg);
-            box-shadow: 0 6px 14px rgba(255, 141, 161, 0.6);
+            box-shadow: 0 7px 16px rgba(255, 141, 161, 0.55);
         }
 
-        .btn-send:active {
-            transform: scale(0.95);
-        }
+        .btn-send:active { transform: scale(0.95); }
 
         .chat-box::-webkit-scrollbar, .room-list::-webkit-scrollbar, .chat-input::-webkit-scrollbar {
             width: 5px;
         }
         .chat-box::-webkit-scrollbar-thumb, .room-list::-webkit-scrollbar-thumb, .chat-input::-webkit-scrollbar-thumb {
-            background: #e8e8e8;
+            background: #eaeaea;
             border-radius: 10px;
         }
 
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; height: 32vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.4); }
-            .main-chat { height: 60vh; }
-            .header-right { gap: 6px; }
+            .sidebar { width: 100% !important; height: 35vh; border-right: none; border-bottom: 1px solid rgba(255, 182, 193, 0.3); }
+            .sidebar.collapsed { height: 0; padding: 0; }
+            .main-chat { height: 65vh; }
+            .sidebar-toggle-btn { display: none; }
         }
     </style>
 </head>
@@ -502,51 +622,61 @@
 
 <div class="app-container">
     
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-title">🌸 我的小說靈感庫</div>
-        <div class="btn-add-room" onclick="createNewRoom()">＋ 開啟新聊天室</div>
+        <div class="btn-add-room" onclick="createNewRoom()">＋ 開啟新故事線</div>
         <div class="room-list" id="room-list"></div>
         
         <div class="memory-vault">
             <div class="memory-header" onclick="toggleMemoryVault()">
-                <span>🧠 全域故事設定記憶庫</span>
+                <span>🧠 核心故事設定記憶庫</span>
                 <span id="memory-arrow">▼</span>
             </div>
-            <textarea class="memory-textarea" id="memory-input" placeholder="在這裡輸入故事設定，例：
+            <textarea class="memory-textarea" id="memory-input" placeholder="在這裡設定全域限制，例如：
 - 使用第二人稱稱呼我
-- 回應不可提及女主角自行設定以外的行為
+- 回應不可提及女主自行設定外的行為
 - 絕對不要用粗體字與標題
-- 對話使用「」
-（設定會強力注入到每一次對話中！）" oninput="saveMemory()"></textarea>
+- 對話使用「」" oninput="saveMemory()"></textarea>
         </div>
+
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="收起側欄">◀</button>
     </div>
 
     <div class="main-chat">
+        <button class="floating-toggle" onclick="toggleSidebar()" title="展開側欄">▶</button>
+
         <div class="chat-header">
-            <div class="current-room-title" id="current-room-title">請選擇或建立聊天室</div>
+            <div class="current-room-title" id="current-room-title">請選擇故事線</div>
             <div class="header-right">
                 <select class="model-select" id="model-selector" onchange="changeModel()">
+                    <option value="gemini-3.1-flash-lite">Gemini 3.1 Lite (預設)</option>
                     <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                    <option value="gemini-3.1-flash-lite">Gemini 3.1 Lite (救援)</option>
                     <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
                 </select>
-                <button class="btn-export-chat" onclick="exportCurrentChat()" title="下載為TXT文字檔">📥 導出文本</button>
-                <button class="btn-data-transfer" onclick="downloadAllDataBackup()" title="將所有資料下載為檔案備份">📦 備份進度檔案</button>
                 
+                <button class="btn-config-key" onclick="resetApiKey()">金鑰輸入</button>
+                
+                <div class="burger-menu-container">
+                    <button class="burger-btn" onclick="toggleDropdown(event)" title="更多功能">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <button class="dropdown-item" onclick="exportCurrentChat()">📥 匯出當前文本 (.txt)</button>
+                        <button class="dropdown-item" onclick="downloadAllDataBackup()">📦 備份進度檔案 (.json)</button>
+                        <button class="dropdown-item" onclick="triggerRestoreFileInput()">🚀 匯入檔案還原 (.json)</button>
+                    </div>
+                </div>
+
                 <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="handleRestoreFile(this)">
-                <button class="btn-data-transfer" onclick="triggerRestoreFileInput()" title="上傳備份檔案還原全站資料">🚀 還原進度檔案</button>
-                
-                <input type="file" id="archive-file-input" accept=".webarchive,.html,.mhtml,.txt" style="display: none;" onchange="handleArchiveFile(this)">
-                <button class="btn-data-transfer" style="background: #fff0f2; border-color: var(--pink-dark);" onclick="triggerArchiveFileInput()" title="直接上傳舊的網頁封存檔抽離資料">🔮 從舊網頁封存檔還原</button>
-                
-                <button class="btn-config-key" onclick="resetApiKey()">修改金鑰</button>
             </div>
         </div>
         
         <div class="chat-box" id="chat-box"></div>
         
         <div class="input-area">
-            <textarea class="chat-input" id="chat-input" placeholder="對 AI 說點什麼吧... (Enter 換行)" oninput="autoResizeInput(this)"></textarea>
+            <textarea class="chat-input" id="chat-input" placeholder="對 AI 傾訴新靈感... (Enter 送出 / Shift+Enter 換行)" onkeydown="handleKeyDown(event)" oninput="autoResizeInput(this)"></textarea>
             <button class="btn-send" onclick="sendMessage()" title="發送">
                 <svg viewBox="0 0 24 24" fill="white" width="22px" height="22px">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -558,17 +688,45 @@
 </div>
 
 <script>
-    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用 any 標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
+    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
 
     let rooms = {};
     let currentRoomId = null;
     let isProcessing = false;
-    let selectedModel = 'gemini-2.5-flash';
+    let selectedModel = 'gemini-3.1-flash-lite';
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle-btn');
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            toggleBtn.innerText = '▶';
+        } else {
+            toggleBtn.innerText = '◀';
+        }
+    }
+
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('dropdown-menu');
+        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    document.addEventListener('click', () => {
+        document.getElementById('dropdown-menu').style.display = 'none';
+    });
+
+    function handleKeyDown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
 
     function getCombinedSystemInstruction() {
         const memoryText = localStorage.getItem('pink_writer_memory') || '';
         if (memoryText.trim()) {
-            return `${systemInstructionBase}\n\n【重要：以下是作者填寫的故事設定記憶庫，請在此對話中絕對嚴格遵守執行】：\n${memoryText.trim()}`;
+            return `${systemInstructionBase}\n\n【重要：設定記憶庫】：\n${memoryText.trim()}`;
         }
         return systemInstructionBase;
     }
@@ -576,18 +734,13 @@
     function toggleMemoryVault() {
         const textarea = document.getElementById('memory-input');
         const arrow = document.getElementById('memory-arrow');
-        if (textarea.style.display === 'block') {
-            textarea.style.display = 'none';
-            arrow.innerText = '▼';
-        } else {
-            textarea.style.display = 'block';
-            arrow.innerText = '▲';
-        }
+        const isOpen = textarea.style.display === 'block';
+        textarea.style.display = isOpen ? 'none' : 'block';
+        arrow.innerText = isOpen ? '▼' : '▲';
     }
 
     function saveMemory() {
-        const memoryText = document.getElementById('memory-input').value;
-        localStorage.setItem('pink_writer_memory', memoryText);
+        localStorage.setItem('pink_writer_memory', document.getElementById('memory-input').value);
     }
 
     function changeModel() {
@@ -596,14 +749,14 @@
     }
 
     function autoResizeInput(el) {
-        el.style.height = '50px';
-        el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+        el.style.height = '52px';
+        el.style.height = Math.min(el.scrollHeight, 160) + 'px';
     }
 
     function getApiKey() {
         let key = localStorage.getItem('gemini_api_key_pink_v25');
         if (!key) {
-            key = prompt("歡迎來到你的專屬寫作室！🌸\n請輸入你的 Google Gemini API Key 以啟動 AI 大腦：");
+            key = prompt("請輸入您的 Google Gemini API Key 以開啟專屬寫作靈感箱：");
             if (key) {
                 key = key.trim();
                 localStorage.setItem('gemini_api_key_pink_v25', key);
@@ -613,27 +766,28 @@
     }
 
     function resetApiKey() {
-        localStorage.removeItem('gemini_api_key_pink_v25');
-        getApiKey();
+        let oldKey = localStorage.getItem('gemini_api_key_pink_v25') || '';
+        let newKey = prompt("修改你的 Gemini API Key 金鑰：", oldKey);
+        if (newKey !== null) {
+            localStorage.setItem('gemini_api_key_pink_v25', newKey.trim());
+        }
     }
 
     function loadAppInitialization() {
-        const savedModel = localStorage.getItem('pink_writer_model');
-        if (savedModel) {
-            selectedModel = savedModel;
-        }
+        const savedModel = localStorage.getItem('pink_writer_model') || 'gemini-3.1-flash-lite';
+        selectedModel = savedModel;
         document.getElementById('model-selector').value = selectedModel;
 
-        const savedMemory = localStorage.getItem('pink_writer_memory') || '';
-        document.getElementById('memory-input').value = savedMemory;
+        document.getElementById('memory-input').value = localStorage.getItem('pink_writer_memory') || '';
 
         const savedRooms = localStorage.getItem('pink_chat_rooms_v3');
         if (savedRooms) {
             rooms = JSON.parse(savedRooms);
         } else {
-            const defaultId = 'room-' + Date.now();
+            // 預設聊天室設定
+            const defaultId = 'room-default';
             rooms[defaultId] = {
-                name: "🌸 新的小說劇本",
+                name: "🌸 預設小說劇本線",
                 messages: []
             };
         }
@@ -657,7 +811,7 @@
             roomItem.onclick = () => switchRoom(id);
 
             roomItem.innerHTML = `
-                <span class="room-name" id="room-display-name-${id}">${rooms[id].name}</span>
+                <span class="room-name">${rooms[id].name}</span>
                 <div class="room-item-actions">
                     <button class="btn-room-action" onclick="renameRoom(event, '${id}')" title="重新命名">✎</button>
                     <button class="btn-room-action" onclick="deleteRoom(event, '${id}')" title="刪除">✕</button>
@@ -668,15 +822,11 @@
     }
 
     function createNewRoom() {
-        const roomName = prompt("請輸入新聊天室的劇本主題名稱：", "🎬 未命名故事線");
+        const roomName = prompt("請輸入新故事劇本的主題名稱：", "🎬 未命名故事線");
         if (!roomName) return;
 
         const newId = 'room-' + Date.now();
-        rooms[newId] = {
-            name: roomName,
-            messages: []
-        };
-
+        rooms[newId] = { name: roomName, messages: [] };
         currentRoomId = newId;
         saveRoomsToStorage();
         renderSidebar();
@@ -686,7 +836,7 @@
     function renameRoom(event, id) {
         event.stopPropagation();
         const currentName = rooms[id].name;
-        const newName = prompt(`請輸入「${currentName}」的新故事線名稱：`, currentName);
+        const newName = prompt(`為「${currentName}」更換新名字：`, currentName);
         if (newName && newName.trim() !== "") {
             rooms[id].name = newName.trim();
             saveRoomsToStorage();
@@ -707,10 +857,10 @@
     function deleteRoom(event, id) {
         event.stopPropagation(); 
         if (Object.keys(rooms).length <= 1) {
-            alert("最少要保留一個聊天室喔！");
+            alert("保留最後一條故事線，才能留住靈魂喔！");
             return;
         }
-        if (confirm(`確定要刪除「${rooms[id].name}」及其所有對話歷史嗎？`)) {
+        if (confirm(`確定要將「${rooms[id].name}」化為灰燼嗎？這無法還原喔！`)) {
             delete rooms[id];
             if (currentRoomId === id) {
                 currentRoomId = Object.keys(rooms)[0];
@@ -727,7 +877,7 @@
         chatBox.innerHTML = '';
 
         if (!currentRoomId || !rooms[currentRoomId]) {
-            titleContainer.innerText = "請建立聊天室";
+            titleContainer.innerText = "請建立劇本線";
             return;
         }
 
@@ -735,22 +885,16 @@
         const messages = rooms[currentRoomId].messages;
 
         if (messages.length === 0) {
-            appendMessageNode("你好！在這個房間裡，你想讓我陪你創作什麼樣的故事呢？", 'ai', -1);
+            appendMessageNode("準備好了，你想讓我陪你撰寫什麼樣的虛構小說情節？", 'ai', -1);
         } else {
             messages.forEach((msg, idx) => {
-                if (msg.type === 'user') {
-                    appendMessageNode(msg.text, 'user', idx);
-                } else if (msg.type === 'ai') {
-                    const activeVersionIndex = msg.activeIndex || 0;
-                    const textToShow = msg.versions[activeVersionIndex] || "（無回應）";
-                    appendMessageNode(textToShow, 'ai', idx);
-                }
+                appendMessageNode(msg, msg.type, idx);
             });
         }
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function appendMessageNode(text, type, index) {
+    function appendMessageNode(msgData, type, index) {
         const chatBox = document.getElementById('chat-box');
         const container = document.createElement('div');
         container.className = `message-container ${type}`;
@@ -758,7 +902,31 @@
 
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${type === 'user' ? 'user-message' : 'ai-message'}`;
-        msgDiv.innerText = text;
+
+        // 動態判定要展示哪一個版本
+        let textToShow = "";
+        let activeIdx = 0;
+        let totalVersions = 1;
+
+        if (type === 'user') {
+            if (typeof msgData === 'string') {
+                textToShow = msgData;
+                // 相容舊資料格式，自動升級為多版本物件
+                rooms[currentRoomId].messages[index] = { type: 'user', versions: [msgData], activeIndex: 0 };
+                activeIdx = 0;
+                totalVersions = 1;
+            } else {
+                activeIdx = msgData.activeIndex || 0;
+                textToShow = msgData.versions[activeIdx] || "";
+                totalVersions = msgData.versions.length;
+            }
+        } else {
+            activeIdx = msgData.activeIndex || 0;
+            textToShow = msgData.versions[activeIdx] || "";
+            totalVersions = msgData.versions.length;
+        }
+
+        msgDiv.innerText = textToShow;
         container.appendChild(msgDiv);
 
         if (index >= 0) {
@@ -769,40 +937,40 @@
                 const editBtn = document.createElement('button');
                 editBtn.className = 'action-btn';
                 editBtn.innerHTML = '✎ 更改提示';
-                editBtn.onclick = () => enableEditMode(container, index, text);
+                editBtn.onclick = () => enableEditMode(container, index, textToShow);
                 actionsDiv.appendChild(editBtn);
             } else if (type === 'ai') {
                 const refreshBtn = document.createElement('button');
                 refreshBtn.className = 'action-btn';
-                refreshBtn.innerHTML = '↻ 刷新回答';
+                refreshBtn.innerHTML = '↻ 刷新回應';
                 refreshBtn.onclick = () => requestNewBranch(index);
                 actionsDiv.appendChild(refreshBtn);
+            }
 
-                const msgData = rooms[currentRoomId].messages[index];
-                if (msgData && msgData.versions && msgData.versions.length > 1) {
-                    const switcher = document.createElement('div');
-                    switcher.className = 'version-switcher';
-                    
-                    const leftBtn = document.createElement('button');
-                    leftBtn.className = 'version-arrow';
-                    leftBtn.innerText = '◀';
-                    leftBtn.disabled = msgData.activeIndex === 0;
-                    leftBtn.onclick = () => switchVersion(index, -1);
+            // 無論是用戶提示還是AI回應，只要版本大於1，均顯示前後頁面切換紐
+            if (totalVersions > 1) {
+                const switcher = document.createElement('div');
+                switcher.className = 'version-switcher';
+                
+                const leftBtn = document.createElement('button');
+                leftBtn.className = 'version-arrow';
+                leftBtn.innerText = '◀';
+                leftBtn.disabled = activeIdx === 0;
+                leftBtn.onclick = () => switchVersion(index, -1);
 
-                    const infoSpan = document.createElement('span');
-                    infoSpan.innerText = `${msgData.activeIndex + 1} / ${msgData.versions.length}`;
+                const infoSpan = document.createElement('span');
+                infoSpan.innerText = `${activeIdx + 1} / ${totalVersions}`;
 
-                    const rightBtn = document.createElement('button');
-                    rightBtn.className = 'version-arrow';
-                    rightBtn.innerText = '▶';
-                    rightBtn.disabled = msgData.activeIndex === msgData.versions.length - 1;
-                    rightBtn.onclick = () => switchVersion(index, 1);
+                const rightBtn = document.createElement('button');
+                rightBtn.className = 'version-arrow';
+                rightBtn.innerText = '▶';
+                rightBtn.disabled = activeIdx === totalVersions - 1;
+                rightBtn.onclick = () => switchVersion(index, 1);
 
-                    switcher.appendChild(leftBtn);
-                    switcher.appendChild(infoSpan);
-                    switcher.appendChild(rightBtn);
-                    actionsDiv.appendChild(switcher);
-                }
+                switcher.appendChild(leftBtn);
+                switcher.appendChild(infoSpan);
+                switcher.appendChild(rightBtn);
+                actionsDiv.appendChild(switcher);
             }
             
             container.appendChild(actionsDiv);
@@ -823,7 +991,6 @@
 
     function enableEditMode(container, index, currentText) {
         if (isProcessing) return;
-        
         container.innerHTML = `
             <textarea class="edit-textarea" id="edit-box-${index}">${currentText}</textarea>
             <div class="edit-controls">
@@ -840,8 +1007,13 @@
             return;
         }
 
+        const msgObj = rooms[currentRoomId].messages[index];
+        // 增加新的提示分支，而不洗掉舊的紀錄
+        msgObj.versions.push(newText);
+        msgObj.activeIndex = msgObj.versions.length - 1;
+
+        // 砍掉舊分支後面的所有對話
         rooms[currentRoomId].messages.splice(index + 1);
-        rooms[currentRoomId].messages[index].text = newText;
 
         saveRoomsToStorage();
         renderChatBox();
@@ -850,6 +1022,8 @@
 
     async function requestNewBranch(aiMsgIndex) {
         if (isProcessing) return;
+        
+        // 刷新回應時，只將此回應後的對話清除
         rooms[currentRoomId].messages.splice(aiMsgIndex + 1);
         saveRoomsToStorage();
         
@@ -863,17 +1037,15 @@
         if (!text || !currentRoomId) return;
 
         const apiKey = getApiKey();
-        if (!apiKey) {
-            alert("必須設定金鑰才能連線喔！");
-            return;
-        }
+        if (!apiKey) return;
 
         inputEl.value = '';
         autoResizeInput(inputEl);
 
         rooms[currentRoomId].messages.push({
             type: 'user',
-            text: text
+            versions: [text],
+            activeIndex: 0
         });
         
         saveRoomsToStorage();
@@ -889,16 +1061,11 @@
         for (let i = 0; i < limit; i++) {
             const m = list[i];
             if (m.type === 'user') {
-                apiContents.push({
-                    role: 'user',
-                    parts: [{ text: m.text }]
-                });
+                const activeText = m.versions ? m.versions[m.activeIndex || 0] : m.text;
+                apiContents.push({ role: 'user', parts: [{ text: activeText }] });
             } else if (m.type === 'ai') {
                 const activeText = m.versions[m.activeIndex || 0];
-                apiContents.push({
-                    role: 'model',
-                    parts: [{ text: activeText }]
-                });
+                apiContents.push({ role: 'model', parts: [{ text: activeText }] });
             }
         }
         return apiContents;
@@ -911,23 +1078,36 @@
         isProcessing = true;
         const chatBox = document.getElementById('chat-box');
         
-        const loadingContainer = document.createElement('div');
-        loadingContainer.className = 'message-container ai';
-        const loadingMsg = document.createElement('div');
-        loadingMsg.className = 'message ai-message loading-pulse';
-        loadingMsg.innerText = '正在為你斟酌新靈感...🌸';
-        loadingContainer.appendChild(loadingMsg);
-        chatBox.appendChild(loadingContainer);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        let loadingContainer;
+        let loadingMsg;
+
+        // 刷新回應：如果是在既有的AI位置刷新，將原位置渲染成正在刷新的狀態
+        if (isRefreshingIndex !== -1) {
+            renderChatBox(); // 刷回乾淨狀態
+            const containerToReplace = document.getElementById(`msg-container-${isRefreshingIndex}`);
+            if (containerToReplace) {
+                loadingMsg = containerToReplace.querySelector('.message');
+                loadingMsg.className = 'message ai-message loading-pulse';
+                loadingMsg.innerText = '正在重新推敲新章節...🌸';
+            }
+        } else {
+            // 普通發送：在尾端追加閃爍特效框
+            loadingContainer = document.createElement('div');
+            loadingContainer.className = 'message-container ai';
+            loadingMsg = document.createElement('div');
+            loadingMsg.className = 'message ai-message loading-pulse';
+            loadingMsg.innerText = '正在為你斟酌新靈感...🌸';
+            loadingContainer.appendChild(loadingMsg);
+            chatBox.appendChild(loadingContainer);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
         let apiHistory = buildApiContents(isRefreshingIndex);
 
         try {
             const requestBody = {
                 contents: apiHistory,
-                systemInstruction: {
-                    parts: [{ text: getCombinedSystemInstruction() }]
-                }
+                systemInstruction: { parts: [{ text: getCombinedSystemInstruction() }] }
             };
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
@@ -938,12 +1118,12 @@
 
             if (!response.ok) {
                 const errData = await response.json();
-                throw new Error(errData.error?.message || "網路連線異常");
+                throw new Error(errData.error?.message || "線路塞車中");
             }
 
             const data = await response.json();
             if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
-                throw new Error("模型未吐回正常文本，可能觸發了後台文字敏感度審查封鎖。");
+                throw new Error("模型空回，可能是字詞觸發了後台審查機制。");
             }
             
             const aiText = data.candidates[0].content.parts[0].text;
@@ -961,10 +1141,9 @@
             }
             
             saveRoomsToStorage();
-
         } catch (error) {
             console.error(error);
-            alert("對話連線失敗。原因：" + error.message);
+            alert("對話連線失敗：" + error.message);
         } finally {
             isProcessing = false;
             renderChatBox();
@@ -972,43 +1151,27 @@
     }
 
     function exportCurrentChat() {
-        if (!currentRoomId || !rooms[currentRoomId]) {
-            alert("沒有選取任何故事線，無法匯出喔！");
-            return;
-        }
-
+        if (!currentRoomId || !rooms[currentRoomId]) return;
         const room = rooms[currentRoomId];
-        const memoryText = localStorage.getItem('pink_writer_memory') || '（目前無設定）';
+        const memoryText = localStorage.getItem('pink_writer_memory') || '（當前無全域設定）';
         
-        let fileContent = `=========================================\n`;
-        fileContent += `🌸 故事劇本線：${room.name}\n`;
-        fileContent += `🧠 當時使用的全域設定記憶庫：\n${memoryText.trim()}\n`;
-        fileContent += `=========================================\n\n`;
+        let fileContent = `=========================================\n🌸 故事劇本線：${room.name}\n🧠 記憶設定備忘：\n${memoryText.trim()}\n=========================================\n\n`;
 
-        if (room.messages.length === 0) {
-            fileContent += `（當前房間尚未開始對話）\n`;
-        } else {
-            room.messages.forEach((msg, idx) => {
-                if (msg.type === 'user') {
-                    fileContent += `【作者提示】\n${msg.text}\n\n`;
-                } else if (msg.type === 'ai') {
-                    const activeIndex = msg.activeIndex || 0;
-                    const text = msg.versions[activeIndex] || '';
-                    fileContent += `【AI 創作】\n${text}\n\n`;
-                    fileContent += `-----------------------------------------\n\n`;
-                }
-            });
-        }
+        room.messages.forEach(msg => {
+            const idx = msg.activeIndex || 0;
+            if (msg.type === 'user') {
+                const text = msg.versions ? msg.versions[idx] : msg.text;
+                fileContent += `【作者提示】\n${text}\n\n`;
+            } else if (msg.type === 'ai') {
+                fileContent += `【AI 創作】\n${msg.versions[idx]}\n\n-----------------------------------------\n\n`;
+            }
+        });
 
         const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        
-        const safeName = room.name.replace(/[\\/:*?"<>|]/g, "");
         link.setAttribute("href", url);
-        link.setAttribute("download", `${safeName}_對話備份.txt`);
-        link.style.visibility = 'hidden';
-        
+        link.setAttribute("download", `${room.name.replace(/[\\/:*?"<>|]/g, "")}_文字備份.txt`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -1019,15 +1182,11 @@
             rooms: localStorage.getItem('pink_chat_rooms_v3') || '[]',
             memory: localStorage.getItem('pink_writer_memory') || ''
         };
-        
         const blob = new Blob([JSON.stringify(dataPackage, null, 2)], { type: 'application/json;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        
         link.setAttribute("href", url);
-        link.setAttribute("download", `pink_writer_backup.json`);
-        link.style.visibility = 'hidden';
-        
+        link.setAttribute("download", `pink_story_backup.json`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -1046,141 +1205,24 @@
             try {
                 const parsedData = JSON.parse(e.target.result);
                 if (parsedData.rooms) {
-                    if (confirm("偵測到有效的備份檔案！這將會覆蓋目前網頁上的所有故事線與記憶庫，確定要載入還原嗎？")) {
+                    if (confirm("這會完全覆蓋當前所有房間的進度，確定匯入嗎？")) {
                         localStorage.setItem('pink_chat_rooms_v3', parsedData.rooms);
                         localStorage.setItem('pink_writer_memory', parsedData.memory || '');
-                        alert("還原成功！正在為你載入故事...🌸");
+                        alert("還原大成功！");
                         window.location.reload();
                     }
                 } else {
-                    alert("載入失敗：此檔案格式不正確，並非本寫作室專用的備份檔。");
+                    alert("格式不符，請上傳正確的 .json 備份檔案。");
                 }
             } catch (err) {
-                console.error(err);
-                alert("檔案讀取發生錯誤，請確認上傳的是正確的備份 .json 檔案。");
+                alert("檔案讀取發生錯誤。");
             }
             input.value = '';
         };
         reader.readAsText(file);
     }
 
-    // 【極速救援核心】觸發讀取網頁封存檔的上傳按鈕
-    function triggerArchiveFileInput() {
-        document.getElementById('archive-file-input').click();
-    }
-
-    // 解析舊網頁封存檔、html 檔案並抓回資料
-    function handleArchiveFile(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const rawText = e.target.result;
-            
-            // 尋找網頁封存檔中寫死的 localStorage 痕跡（通常封存在網頁最底部的 JSON 或是快取區塊）
-            let matchRooms = rawText.match(/&quot;pink_chat_rooms_v3&quot;:\s*&quot;([^&]+)&quot;/);
-            if (!matchRooms) {
-                matchRooms = rawText.match(/"pink_chat_rooms_v3":\s*"([^"]+)"/);
-            }
-            
-            let matchMemory = rawText.match(/&quot;pink_writer_memory&quot;:\s*&quot;([^&]+)&quot;/);
-            if (!matchMemory) {
-                matchMemory = rawText.match(/"pink_writer_memory":\s*"([^"]+)"/);
-            }
-
-            try {
-                let foundRoomsStr = null;
-                let foundMemoryStr = "";
-
-                if (matchRooms && matchRooms[1]) {
-                    // 解碼可能被跳脫的文字
-                    foundRoomsStr = matchRooms[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-                    // 修正 HTML 實體編碼
-                    foundRoomsStr = foundRoomsStr.replace(/&quot;/g, '"');
-                }
-                
-                if (matchMemory && matchMemory[1]) {
-                    foundMemoryStr = matchMemory[1].replace(/\\n/g, '\n').replace(/&quot;/g, '"');
-                }
-
-                // 精準二次深度搜查：如果上面的正則沒抓到，改抓凍結在舊 HTML 內部的 room-name 結構
-                if (!foundRoomsStr) {
-                    alert("抱歉，無法從此檔案的系統快取中直接析出資料。我們將自動啟動「文字結構深度打撈」...");
-                    // 嘗試撈取文字結構進行局部重建
-                    reconstructFromHTML(rawText);
-                    return;
-                }
-
-                // 如果順利找到完整的靈魂封裝，直接完美還原
-                if (confirm("🎉 奇蹟發生！成功從網頁封存檔中提煉出你之前消失的所有劇本與記憶庫！\n點擊確認將立即全面覆蓋並復活你的故事線。")) {
-                    // 還原進快取
-                    localStorage.setItem('pink_chat_rooms_v3', JSON.parse(`"${foundRoomsStr}"`));
-                    if (foundMemoryStr) {
-                        localStorage.setItem('pink_writer_memory', JSON.parse(`"${foundMemoryStr}"`));
-                    }
-                    alert("故事線已完全復活！🌸");
-                    window.location.reload();
-                }
-
-            } catch (err) {
-                console.error(err);
-                alert("雖然找到了故事殘留，但解碼失敗。為你切換至「文字結構深度打撈」...");
-                reconstructFromHTML(rawText);
-            }
-            input.value = '';
-        };
-        reader.readAsText(file);
-    }
-
-    // 備用救援方案：如果快取被洗掉，直接從網頁渲染出來的對話區塊（HTML）硬把文字幹回來
-    function reconstructFromHTML(htmlContent) {
-        try {
-            // 解析出所有對話訊息
-            let userMsgs = [...htmlContent.matchAll(/class="message user-message"[^>]*>([\s\S]*?)<\/div>/g)].map(m => m[1].trim());
-            let aiMsgs = [...htmlContent.matchAll(/class="message ai-message[^"]*"[^>]*>([\s\S]*?)<\/div>/g)].map(m => m[1].trim());
-            
-            // 去除首個AI歡迎詞
-            if (aiMsgs.length > 0 && aiMsgs[0].includes("你想讓我陪你創作什麼樣的故事")) {
-                aiMsgs.shift();
-            }
-
-            if (userMsgs.length === 0 && aiMsgs.length === 0) {
-                alert("救援失敗：這個檔案裡找不到任何之前留下的對話痕跡。");
-                return;
-            }
-
-            let rebuiltMessages = [];
-            let maxLength = Math.max(userMsgs.length, aiMsgs.length);
-            
-            for(let i=0; i<maxLength; i++) {
-                if(userMsgs[i]) {
-                    rebuiltMessages.push({ type: 'user', text: userMsgs[i] });
-                }
-                if(aiMsgs[i]) {
-                    rebuiltMessages.push({ type: 'ai', versions: [aiMsgs[i]], activeIndex: 0 });
-                }
-            }
-
-            if (confirm(`🌟 局部打撈成功！成功從畫面結構中救回了 ${rebuiltMessages.length} 條對話！\n是否要將這些對話匯入成一個獨立的「🩹 深度打撈救援故事線」？`)) {
-                let savedRooms = localStorage.getItem('pink_chat_rooms_v3');
-                let localRooms = savedRooms ? JSON.parse(savedRooms) : {};
-                
-                const rescueId = 'rescue-' + Date.now();
-                localRooms[rescueId] = {
-                    name: "🩹 深度打撈救援故事線",
-                    messages: rebuiltMessages
-                };
-                
-                localStorage.setItem('pink_chat_rooms_v3', JSON.stringify(localRooms));
-                alert("救援房間已成功插入！🌸");
-                window.location.reload();
-            }
-        } catch (e) {
-            console.error(e);
-            alert("深度打撈失敗，這個檔案可能毀損或未包含對話文字。");
-        }
-    }
+    window.addEventListener('DOMContentLoaded', loadAppInitialization);
 </script>
 
 </body>
