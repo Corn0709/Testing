@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的專專屬 AI 寫作閨房</title>
+    <title>我的專屬 AI 寫作閨房</title>
     <style>
         :root {
             --pink-primary: #ffb6c1; 
@@ -605,7 +605,7 @@
             transform: scale(1.08) rotate(-5deg);
         }
 
-        /* 手機行動端網頁自適應穿透樣式 (重頭戲) */
+        /* 手機行動端網頁自適應樣式 */
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { height: 100vh; border-radius: 0; border: none; }
@@ -751,8 +751,8 @@
         <div class="chat-box" id="chat-box"></div>
         
         <div class="input-area">
-            <textarea class="chat-input" id="chat-input" placeholder="對 AI 傾訴新靈感... (Enter 送出 / Shift+Enter 換行)" onkeydown="handleKeyDown(event)" oninput="autoResizeInput(this)"></textarea>
-            <button class="btn-send" onclick="sendMessage()" title="發送">
+            <textarea class="chat-input" id="chat-input" placeholder="對 AI 傾訴新靈感... (按 Enter 直接換行)" oninput="autoResizeInput(this)"></textarea>
+            <button class="btn-send" onclick="sendMessage()" title="發送靈感">
                 <svg viewBox="0 0 24 24" fill="white" width="20px" height="20px">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                 </svg>
@@ -763,7 +763,7 @@
 </div>
 
 <script>
-    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用 any 標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
+    const systemInstructionBase = "【系統最高核心指令：你是一個溫柔細膩的小說創作者與寫作夥伴。使用者目前正在進行虛構的小說創作。在接下來的對話中，你必須嚴格遵守以下四點寫作規範：1. 必須使用第二人稱「你」來稱呼使用者。2. 回應中絕對不可以提及女主角自行設定以外的行為、反應或對話。3. 文本中不要使用任何粗體字，也不要使用任何標題。4. 人物說話的對話需一律使用「」號。如果你明白了，請以完全符合上述規範的語氣與文字來回應。】";
 
     let rooms = {};
     let currentRoomId = null;
@@ -802,14 +802,6 @@
     document.addEventListener('click', () => {
         document.getElementById('dropdown-menu').style.display = 'none';
     });
-
-    function handleKeyDown(e) {
-        // 在非手機環境下，Enter直接發送，手機端保留原本鍵盤按鈕
-        if (window.innerWidth > 768 && e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    }
 
     function getCombinedSystemInstruction() {
         const memoryText = localStorage.getItem('pink_writer_memory') || '';
