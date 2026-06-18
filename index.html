@@ -605,28 +605,29 @@
             transform: scale(1.08) rotate(-5deg);
         }
 
-        /* 手機行動端網頁自適應樣式 */
+        /* 手機行動端精簡自適應樣式 */
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { height: 100vh; border-radius: 0; border: none; }
             
-            /* 手機版側欄轉化為底部抽屜式 */
+            /* 將彈出抽屜高度調整為適中的 55vh，顯得更短不擁擠 */
             .sidebar {
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 width: 100% !important;
-                height: 75vh;
-                background: rgba(255, 255, 255, 0.96);
+                height: 55vh; 
+                background: rgba(255, 255, 255, 0.97);
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
                 z-index: 999;
                 border-right: none;
                 border-top: 1px solid rgba(255, 182, 193, 0.4);
-                border-radius: 24px 24px 0 0;
+                border-radius: 20px 20px 0 0;
                 transform: translateY(100%);
-                box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
-                padding: 25px 20px;
+                box-shadow: 0 -8px 25px rgba(0,0,0,0.06);
+                padding: 18px 16px;
+                gap: 12px;
             }
             
             .sidebar.active-mobile {
@@ -637,50 +638,54 @@
                 display: none;
             }
 
-            /* 手機版遮罩 */
             .sidebar-overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.2);
+                background: rgba(0,0,0,0.15);
                 z-index: 998;
                 display: none;
-                backdrop-filter: blur(2px);
-                -webkit-backdrop-filter: blur(2px);
+                backdrop-filter: blur(1px);
+                -webkit-backdrop-filter: blur(1px);
             }
 
             .sidebar-overlay.active {
                 display: block;
             }
 
-            /* 頂欄微調 */
+            /* 頂欄與對話精簡化 */
             .mobile-menu-trigger {
                 display: block;
             }
             .chat-header {
-                padding: 12px 16px;
+                padding: 10px 12px;
             }
             .current-room-title {
-                font-size: 15px;
+                font-size: 14px;
             }
             .header-right {
-                gap: 6px;
+                gap: 5px;
             }
             .model-select {
-                padding: 5px 8px;
-                font-size: 11px;
+                padding: 4px 6px;
+                font-size: 10px;
             }
             .btn-config-key {
-                padding: 5px 10px;
-                font-size: 11px;
+                padding: 4px 8px;
+                font-size: 10px;
             }
 
-            .chat-box { padding: 15px; gap: 18px; }
-            .message-container { max-width: 90%; }
-            .message { font-size: 14px; padding: 11px 15px; }
-            .input-area { padding: 12px 16px; }
+            .chat-box { padding: 12px; gap: 14px; }
+            .message-container { max-width: 92%; }
+            .message { font-size: 14px; padding: 10px 14px; line-height: 1.5; }
+            .message-actions { gap: 6px; margin-top: 6px; }
+            .action-btn { padding: 3px 10px; font-size: 10px; }
+            .version-switcher { padding: 2px 8px; font-size: 10px; }
+            .input-area { padding: 10px 12px; gap: 8px; }
+            .chat-input { padding: 10px 15px; font-size: 14px; height: 44px; }
+            .btn-send { width: 44px; height: 44px; }
         }
     </style>
 </head>
@@ -715,7 +720,7 @@
 
         <div class="chat-header">
             <button class="mobile-menu-trigger" onclick="openMobileSidebar()" title="打開故事列表">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M4 6h16M4 12h16M4 18h7"/>
                 </svg>
             </button>
@@ -753,7 +758,7 @@
         <div class="input-area">
             <textarea class="chat-input" id="chat-input" placeholder="對 AI 傾訴新靈感... (按 Enter 直接換行)" oninput="autoResizeInput(this)"></textarea>
             <button class="btn-send" onclick="sendMessage()" title="發送靈感">
-                <svg viewBox="0 0 24 24" fill="white" width="20px" height="20px">
+                <svg viewBox="0 0 24 24" fill="white" width="18px" height="18px">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                 </svg>
             </button>
@@ -770,7 +775,6 @@
     let isProcessing = false;
     let selectedModel = 'gemini-3.1-flash-lite';
 
-    /* 手機版側欄喚醒 */
     function openMobileSidebar() {
         document.getElementById('sidebar').classList.add('active-mobile');
         document.getElementById('sidebar-overlay').classList.add('active');
@@ -781,7 +785,6 @@
         document.getElementById('sidebar-overlay').classList.remove('active');
     }
 
-    /* 桌機與平板收縮功能 */
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.querySelector('.sidebar-toggle-btn');
@@ -829,7 +832,7 @@
     }
 
     function autoResizeInput(el) {
-        el.style.height = '52px';
+        el.style.height = window.innerWidth <= 768 ? '44px' : '52px';
         el.style.height = Math.min(el.scrollHeight, 160) + 'px';
     }
 
