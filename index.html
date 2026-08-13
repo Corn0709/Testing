@@ -200,7 +200,7 @@
     }
     .chat-item-info { flex: 1; }
     .chat-item-name { font-size: 16px; font-weight: 600; color: #590d22; }
-    .chat-item-last { font-size: 13px; color: #a37081; margin-top: 2px; }
+    .chat-item-last { font-size: 13px; color: #a37081; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
 
     /* 單一聊天室內頁 */
     .chat-room {
@@ -214,7 +214,7 @@
     .msg { max-width: 75%; display: flex; flex-direction: column; }
     .msg.sent { align-self: flex-end; }
     .msg.received { align-self: flex-start; }
-    .msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-break: break-word; }
+    .msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-break: break-word; white-space: pre-wrap; }
     .sent .msg-bubble { background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%); color: #fff; border-bottom-right-radius: 4px; }
     .received .msg-bubble { background: #fff; color: #590d22; border-bottom-left-radius: 4px; box-shadow: 0 2px 6px rgba(255, 182, 193, 0.3); }
 
@@ -358,7 +358,6 @@
     let inputPasscode = '';
     let currentRoomId = null;
 
-    // 泛用存取 JSON 資料
     let rawImportedJson = localStorage.getItem('ios_raw_json') ? JSON.parse(localStorage.getItem('ios_raw_json')) : null;
     let chatsData = JSON.parse(localStorage.getItem('ios_chats_data')) || [
       {
@@ -514,7 +513,7 @@
       localStorage.setItem('ios_chats_data', JSON.stringify(chatsData));
     }
 
-    /* 泛用 JSON 匯入與匯出 */
+    /* 泛用 JSON 匯入與解析轉換機制 */
     function exportData() {
       const exportTarget = rawImportedJson || chatsData;
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportTarget, null, 2));
@@ -526,6 +525,36 @@
       downloadAnchor.remove();
     }
 
+    function parseJsonToMessages(data) {
+      let messages = [];
+      
+      if (typeof data === 'string') {
+        messages.push({ sender: 'received', text: data });
+      } else if (Array.isArray(data)) {
+        data.forEach(item => {
+          if (typeof item === 'string') {
+            messages.push({ sender: 'received', text: item });
+          } else if (typeof item === 'object' && item !== null) {
+            // 自動尋找常見的文字欄位
+            const textContent = item.text || item.content || item.message || item.prompt || item.response || JSON.stringify(item, null, 2);
+            const senderType = (item.role === 'user' || item.sender === 'user' || item.sender === 'sent') ? 'sent' : 'received';
+            messages.push({ sender: senderType, text: textContent });
+          }
+        });
+      } else if (typeof data === 'object' && data !== null) {
+        // 如果是物件，遍歷屬性
+        Object.keys(data).forEach(key => {
+          const val = data[key];
+          if (typeof val === 'string') {
+            messages.push({ sender: 'received', text: `${key}: ${val}` });
+          } else {
+            messages.push({ sender: 'received', text: `${key}:\n${JSON.stringify(val, null, 2)}` });
+          }
+        });
+      }
+      return messages;
+    }
+
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -535,17 +564,29 @@
         try {
           const parsed = JSON.parse(e.target.result);
           
-          // 儲存原始 JSON 數據
           rawImportedJson = parsed;
           localStorage.setItem('ios_raw_json', JSON.stringify(parsed));
 
-          // 若匯入的是陣列且包含資料，同步調整畫面顯示
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          // 判斷是否為標準聊天格式，若不是則自動轉換
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].id && parsed[0].messages) {
             chatsData = parsed;
-            saveChatsData();
+          } else {
+            // 自動轉換非標準格式為一個新聊天室
+            const roomName = file.name.replace('.json', '') || '匯入的檔案';
+            const convertedMessages = parseJsonToMessages(parsed);
+            
+            const newRoom = {
+              id: 'room_import_' + Date.now(),
+              name: roomName,
+              messages: convertedMessages
+            };
+            
+            chatsData.unshift(newRoom); // 加到列表最上方
           }
+
+          saveChatsData();
+          alert('JSON 檔案已成功匯入並轉為聊天室！');
           
-          alert('JSON 檔案已成功匯入與儲存！');
           if (document.getElementById('instagramApp').style.display === 'flex') {
             renderChatList();
           }
