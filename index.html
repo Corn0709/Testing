@@ -152,7 +152,7 @@
       padding-top: 50px;
     }
 
-    /* 設定 App 樣式 */
+    /* 設定 App */
     .ios-header {
       height: 48px; display: flex; align-items: center; justify-content: space-between;
       padding: 0 16px; background: #f2f2f7;
@@ -170,7 +170,7 @@
     .ios-row input { border: none; outline: none; text-align: right; font-size: 17px; color: #8e8e93; width: 60%; background: transparent; }
     .ios-btn-row { color: #007aff; cursor: pointer; justify-content: center; font-weight: 500; }
 
-    /* IG 粉色聊天介面樣式 */
+    /* IG 粉色介面 */
     .ig-container {
       background: #fff0f3;
       height: 100%;
@@ -211,7 +211,7 @@
       flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;
       background: linear-gradient(180deg, #fff0f3 0%, #ffccd5 100%);
     }
-    .msg { max-width: 75%; display: flex; flex-direction: column; }
+    .msg { max-width: 80%; display: flex; flex-direction: column; }
     .msg.sent { align-self: flex-end; }
     .msg.received { align-self: flex-start; }
     .msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-break: break-word; white-space: pre-wrap; }
@@ -313,7 +313,7 @@
       </div>
     </div>
 
-    <!-- IG 訊息列表視窗 -->
+    <!-- IG 訊息列表 -->
     <div id="instagramApp" class="app-window" style="background:#fff0f3;">
       <div class="ig-container">
         <div class="ig-header">
@@ -323,13 +323,11 @@
             <button class="ig-action-btn" style="font-size:22px;" onclick="addNewChat()">+</button>
           </div>
         </div>
-        <div class="chat-list" id="chatListContainer">
-          <!-- 動態載入聊天室 -->
-        </div>
+        <div class="chat-list" id="chatListContainer"></div>
       </div>
     </div>
 
-    <!-- IG 聊天室內頁 -->
+    <!-- IG 聊天室頁面 -->
     <div id="chatRoomScreen" class="chat-room">
       <div class="ig-header">
         <button class="back" style="color:#ff4d6d; font-size:22px; background:none; border:none; cursor:pointer;" onclick="closeChatRoom()">‹ 訊息</button>
@@ -345,10 +343,7 @@
       </div>
     </div>
 
-    <!-- 隱藏的檔案上傳 Input -->
     <input type="file" id="importFileInput" style="display:none" accept=".json" onchange="importData(event)">
-
-    <!-- 底部 Home Bar (點擊回到桌面) -->
     <div class="home-bar" onclick="returnToHome()"></div>
   </div>
 
@@ -358,13 +353,12 @@
     let inputPasscode = '';
     let currentRoomId = null;
 
-    let rawImportedJson = localStorage.getItem('ios_raw_json') ? JSON.parse(localStorage.getItem('ios_raw_json')) : null;
     let chatsData = JSON.parse(localStorage.getItem('ios_chats_data')) || [
       {
         id: 'room_default',
-        name: '我的專屬AI房間',
+        name: '🌸 預設劇本',
         messages: [
-          { sender: 'received', text: '歡迎回到你的專屬房間！今天想聊什麼呢？' }
+          { sender: 'received', text: '歡迎回到你的專屬房間！今天想演什麼呢？' }
         ]
       }
     ];
@@ -434,7 +428,8 @@
       const container = document.getElementById('chatListContainer');
       container.innerHTML = '';
       chatsData.forEach(chat => {
-        const lastMsg = chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].text : '無訊息';
+        const lastMsgObj = chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null;
+        const lastMsg = lastMsgObj ? lastMsgObj.text : '無訊息';
         const item = document.createElement('div');
         item.className = 'chat-item';
         item.onclick = () => openChatRoom(chat.id);
@@ -513,46 +508,70 @@
       localStorage.setItem('ios_chats_data', JSON.stringify(chatsData));
     }
 
-    /* 泛用 JSON 匯入與解析轉換機制 */
+    /* 核心解析：專門拆解雙重 JSON 與小說劇本多版本結構 */
+    function parseComplexNovelJson(jsonObj) {
+      let importedRooms = [];
+
+      try {
+        let roomsData = jsonObj.rooms;
+        // 如果 rooms 是字串，拆解二次包裝
+        if (typeof roomsData === 'string') {
+          roomsData = JSON.parse(roomsData);
+        }
+
+        if (roomsData && typeof roomsData === 'object') {
+          Object.keys(roomsData).forEach(roomKey => {
+            const rData = roomsData[roomKey];
+            const roomName = rData.name || '小說劇本線';
+            let parsedMsgs = [];
+
+            if (Array.isArray(rData.messages)) {
+              rData.messages.forEach(m => {
+                let msgText = '';
+
+                // 如果有 versions 陣列，抓取 activeIndex 或最新一筆
+                if (Array.isArray(m.versions) && m.versions.length > 0) {
+                  let idx = typeof m.activeIndex === 'number' ? m.activeIndex : m.versions.length - 1;
+                  msgText = m.versions[idx] || m.versions[0];
+                } else if (m.text) {
+                  msgText = m.text;
+                } else if (m.content) {
+                  msgText = m.content;
+                }
+
+                if (msgText) {
+                  // 判斷發送者（user 為傳送者，ai 為接收者）
+                  let senderType = (m.type === 'user' || m.role === 'user' || m.sender === 'sent') ? 'sent' : 'received';
+                  parsedMsgs.push({
+                    sender: senderType,
+                    text: msgText
+                  });
+                }
+              });
+            }
+
+            importedRooms.push({
+              id: 'room_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              name: roomName,
+              messages: parsedMsgs
+            });
+          });
+        }
+      } catch (err) {
+        console.error("解析錯誤:", err);
+      }
+
+      return importedRooms;
+    }
+
     function exportData() {
-      const exportTarget = rawImportedJson || chatsData;
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportTarget, null, 2));
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatsData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `data_backup_${Date.now()}.json`);
+      downloadAnchor.setAttribute("download", `novel_chats_backup_${Date.now()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-    }
-
-    function parseJsonToMessages(data) {
-      let messages = [];
-      
-      if (typeof data === 'string') {
-        messages.push({ sender: 'received', text: data });
-      } else if (Array.isArray(data)) {
-        data.forEach(item => {
-          if (typeof item === 'string') {
-            messages.push({ sender: 'received', text: item });
-          } else if (typeof item === 'object' && item !== null) {
-            // 自動尋找常見的文字欄位
-            const textContent = item.text || item.content || item.message || item.prompt || item.response || JSON.stringify(item, null, 2);
-            const senderType = (item.role === 'user' || item.sender === 'user' || item.sender === 'sent') ? 'sent' : 'received';
-            messages.push({ sender: senderType, text: textContent });
-          }
-        });
-      } else if (typeof data === 'object' && data !== null) {
-        // 如果是物件，遍歷屬性
-        Object.keys(data).forEach(key => {
-          const val = data[key];
-          if (typeof val === 'string') {
-            messages.push({ sender: 'received', text: `${key}: ${val}` });
-          } else {
-            messages.push({ sender: 'received', text: `${key}:\n${JSON.stringify(val, null, 2)}` });
-          }
-        });
-      }
-      return messages;
     }
 
     function importData(event) {
@@ -563,35 +582,24 @@
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          
-          rawImportedJson = parsed;
-          localStorage.setItem('ios_raw_json', JSON.stringify(parsed));
 
-          // 判斷是否為標準聊天格式，若不是則自動轉換
-          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].id && parsed[0].messages) {
-            chatsData = parsed;
+          // 嘗試解鎖複雜小說 JSON
+          let newRooms = parseComplexNovelJson(parsed);
+
+          if (newRooms.length > 0) {
+            // 把解析成功的新房間放到最前面
+            chatsData = [...newRooms, ...chatsData];
+            saveChatsData();
+            alert(`成功匯入小說劇本！已解析成 ${newRooms.length} 個聊天室！`);
           } else {
-            // 自動轉換非標準格式為一個新聊天室
-            const roomName = file.name.replace('.json', '') || '匯入的檔案';
-            const convertedMessages = parseJsonToMessages(parsed);
-            
-            const newRoom = {
-              id: 'room_import_' + Date.now(),
-              name: roomName,
-              messages: convertedMessages
-            };
-            
-            chatsData.unshift(newRoom); // 加到列表最上方
+            alert('檔案格式解析失敗，請確認檔案內容');
           }
 
-          saveChatsData();
-          alert('JSON 檔案已成功匯入並轉為聊天室！');
-          
           if (document.getElementById('instagramApp').style.display === 'flex') {
             renderChatList();
           }
         } catch (err) {
-          alert('讀取失敗，請確認上傳的檔案是標準 JSON 格式');
+          alert('讀取失敗，請確認檔案是標準 JSON 格式');
         }
       };
       reader.readAsText(file);
