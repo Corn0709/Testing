@@ -82,7 +82,7 @@
       cursor: pointer;
     }
 
-    /* 鎖屏 */
+    /* 鎖屏介面 */
     .lock-screen {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -141,7 +141,7 @@
     .icon-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); }
     .icon-instagram svg { width: 36px; height: 36px; fill: #fff; }
 
-    /* 通用視窗 */
+    /* App 視窗 */
     .app-window {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -170,7 +170,7 @@
     .ios-row input { border: none; outline: none; text-align: right; font-size: 16px; color: #8e8e93; width: 60%; background: transparent; }
     .ios-btn-row { color: #007aff; cursor: pointer; justify-content: center; font-weight: 600; }
 
-    /* IG 少女粉風介面 */
+    /* IG 少女粉介面 */
     .ig-container {
       background: #fff5f7;
       height: 100%;
@@ -184,7 +184,7 @@
       backdrop-filter: blur(10px);
     }
     .ig-title { font-size: 18px; font-weight: 700; color: #6b2d3e; }
-    .ig-header-btns { display: flex; gap: 10px; align-items: center; }
+    .ig-header-btns { display: flex; gap: 8px; align-items: center; }
     .ig-btn-action {
       background: #ffe3e8; border: none; color: #ff5c8a; font-size: 14px; font-weight: 600;
       padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: 0.2s;
@@ -207,7 +207,7 @@
     .chat-item-name { font-size: 16px; font-weight: 700; color: #590d22; }
     .chat-item-last { font-size: 13px; color: #aa7a89; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
 
-    /* 單一聊天室 */
+    /* 聊天室頁面 */
     .chat-room {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: #fff5f7; z-index: 180; display: none; flex-direction: column; padding-top: 50px;
@@ -237,7 +237,7 @@
       text-shadow: 0 1px 1px rgba(0,0,0,0.05);
     }
 
-    /* AI 接收方 (左側) */
+    /* 左側 AI 方 */
     .received .msg-bubble {
       background: #ffffff;
       color: #4a1525;
@@ -246,36 +246,36 @@
       border: 1px solid #ffe3e8;
     }
 
-    /* AI 控制面板 (刷新與切換版本) */
+    /* AI 控制面板 (版本切換與刷新) */
     .ai-controls {
-      display: flex; align-items: center; gap: 8px; margin-top: 5px;
-      background: rgba(255, 255, 255, 0.85); border: 1px solid #ffd0d8;
-      padding: 4px 10px; border-radius: 16px; font-size: 12px; color: #883b50;
+      display: flex; align-items: center; gap: 8px; margin-top: 6px;
+      background: rgba(255, 255, 255, 0.9); border: 1px solid #ffd0d8;
+      padding: 4px 12px; border-radius: 18px; font-size: 13px; color: #883b50;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     }
     .ai-btn {
       background: none; border: none; color: #ff5c8a; font-weight: 700;
-      font-size: 13px; cursor: pointer; padding: 2px 6px; border-radius: 8px;
+      font-size: 14px; cursor: pointer; padding: 2px 8px; border-radius: 8px;
     }
     .ai-btn:active { background: #ffe3e8; }
-    .version-tag { font-size: 11px; font-weight: 600; color: #b36b7d; }
+    .version-tag { font-size: 12px; font-weight: 600; color: #b36b7d; }
 
-    /* 輸入列 */
+    /* 輸入區塊 */
     .input-bar {
       padding: 10px 16px 28px 16px; background: #ffffff; display: flex; align-items: center; gap: 10px; border-top: 1px solid #ffe3e8;
     }
     .input-box {
-      flex: 1; height: 42px; background: #fff0f3; border-radius: 22px; display: flex; align-items: center; padding: 0 16px; border: 1px solid #ffccd5;
+      flex: 1; height: 44px; background: #fff0f3; border-radius: 22px; display: flex; align-items: center; padding: 0 16px; border: 1px solid #ffccd5;
     }
     .input-box input { width: 100%; border: none; background: transparent; outline: none; font-size: 15px; color: #590d22; }
     .send-btn {
       background: linear-gradient(135deg, #ff85a2, #ff5c8a); border: none; color: #fff;
-      font-size: 15px; font-weight: 700; padding: 0 18px; height: 42px; border-radius: 21px; cursor: pointer;
+      font-size: 15px; font-weight: 700; padding: 0 20px; height: 44px; border-radius: 22px; cursor: pointer;
       box-shadow: 0 3px 8px rgba(255, 92, 138, 0.3); transition: transform 0.1s;
     }
     .send-btn:active { transform: scale(0.95); }
 
-    /* 操作彈窗 Modal */
+    /* 點擊選項 Modal */
     .modal-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
@@ -290,7 +290,7 @@
 
     .modal-title { font-size: 14px; font-weight: 700; color: #995265; text-align: center; margin-bottom: 6px; }
     .modal-btn {
-      height: 48px; border-radius: 14px; border: none; background: #fff0f3; color: #590d22;
+      height: 50px; border-radius: 14px; border: none; background: #fff0f3; color: #590d22;
       font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
     }
     .modal-btn:active { background: #ffe0e6; }
@@ -365,7 +365,7 @@
         <span style="width: 40px;"></span>
       </div>
       <div class="ios-settings-list">
-        <div class="ios-group-title">系統與外觀</div>
+        <div class="ios-group-title">系統設定</div>
         <div class="ios-group">
           <div class="ios-row">
             <span>解鎖密碼</span>
@@ -377,7 +377,7 @@
           </div>
         </div>
 
-        <div class="ios-group-title">JSON 數據管理</div>
+        <div class="ios-group-title">JSON 數據備份</div>
         <div class="ios-group">
           <div class="ios-row ios-btn-row" onclick="exportData()">下載當前 JSON 檔案</div>
           <div class="ios-row ios-btn-row" onclick="document.getElementById('importFileInput').click()">匯入 JSON 檔案</div>
@@ -399,7 +399,7 @@
       </div>
     </div>
 
-    <!-- IG 聊天室內頁 -->
+    <!-- IG 聊天室頁 -->
     <div id="chatRoomScreen" class="chat-room">
       <div class="ig-header">
         <button class="back" style="color:#ff5c8a; font-size:20px; font-weight:700; background:none; border:none; cursor:pointer;" onclick="closeChatRoom()">‹ 訊息</button>
@@ -415,12 +415,12 @@
       </div>
     </div>
 
-    <!-- 訊息操作 Modal (複製/編輯/刪除) -->
+    <!-- 操作彈窗 Modal -->
     <div class="modal-overlay" id="msgModal" onclick="closeMsgModal(event)">
       <div class="modal-card" onclick="event.stopPropagation()">
         <div class="modal-title" id="modalMsgTitle">訊息選項</div>
-        <button class="modal-btn" onclick="copyModalMsg()">📋 複製提示詞 / 文字</button>
-        <button class="modal-btn" onclick="editModalMsg()">✏️ 編輯這條訊息</button>
+        <button class="modal-btn" onclick="copyModalMsg()">📋 複製內容 / 提示詞</button>
+        <button class="modal-btn" onclick="editModalMsg()">✏️ 編輯訊息內容</button>
         <button class="modal-btn danger" onclick="deleteModalMsg()">🗑️ 刪除這條訊息</button>
         <button class="modal-btn cancel" onclick="closeMsgModal()">取消</button>
       </div>
@@ -437,18 +437,19 @@
     let currentRoomId = null;
     let activeMsgIndex = null;
 
-    let chatsData = JSON.parse(localStorage.getItem('ios_chats_data')) || [
+    // 預設資料
+    const defaultData = [
       {
         id: 'room_default',
         name: '🌸 預設小說劇本線',
         messages: [
           {
-            type: 'user',
+            role: 'user',
             versions: ['我想演白月光和替身的劇情\n名字溫栗，他叫傅硯衡'],
             activeIndex: 0
           },
           {
-            type: 'ai',
+            role: 'assistant',
             versions: [
               '會所內的燈光昏暗且迷離，傅硯衡慵懶地靠在深褐色的真皮沙發上，一隻手臂將你嚴實地圈在懷中……',
               '會所裡的燈光昏暗迷離，傅硯衡察覺到你的僵硬，他垂眸看向你，「怎麼了，小貓，柳橙汁不好喝？」'
@@ -458,6 +459,45 @@
         ]
       }
     ];
+
+    let chatsData = normalizeChatsData(JSON.parse(localStorage.getItem('ios_chats_data')) || defaultData);
+
+    // 強制將所有格式校正為統一標準格式
+    function normalizeChatsData(rawArray) {
+      if (!Array.isArray(rawArray)) return defaultData;
+      return rawArray.map(room => {
+        const cleanMsgs = (room.messages || []).map(m => {
+          const isUserRole = (m.role === 'user' || m.type === 'user' || m.sender === 'sent');
+          let versionsArray = [];
+
+          if (Array.isArray(m.versions) && m.versions.length > 0) {
+            versionsArray = m.versions;
+          } else if (typeof m.content === 'string') {
+            versionsArray = [m.content];
+          } else if (typeof m.text === 'string') {
+            versionsArray = [m.text];
+          } else {
+            versionsArray = [''];
+          }
+
+          let idx = typeof m.activeIndex === 'number' ? m.activeIndex : versionsArray.length - 1;
+          if (idx < 0) idx = 0;
+          if (idx >= versionsArray.length) idx = versionsArray.length - 1;
+
+          return {
+            role: isUserRole ? 'user' : 'assistant',
+            versions: versionsArray,
+            activeIndex: idx
+          };
+        });
+
+        return {
+          id: room.id || ('room_' + Date.now()),
+          name: room.name || '對話房間',
+          messages: cleanMsgs
+        };
+      });
+    }
 
     document.getElementById('iphoneBody').style.backgroundImage = `url('${bgUrl}')`;
     document.getElementById('settingPasscode').value = passcode;
@@ -528,7 +568,7 @@
         if (chat.messages && chat.messages.length > 0) {
           const lastMsgObj = chat.messages[chat.messages.length - 1];
           const idx = lastMsgObj.activeIndex || 0;
-          lastText = lastMsgObj.versions ? (lastMsgObj.versions[idx] || '') : (lastMsgObj.text || '');
+          lastText = lastMsgObj.versions[idx] || '';
         }
 
         const item = document.createElement('div');
@@ -575,7 +615,6 @@
       renderChatList();
     }
 
-    /* 渲染訊息與版本控制控制列 */
     function renderMessages() {
       const chatBody = document.getElementById('chatBody');
       chatBody.innerHTML = '';
@@ -583,28 +622,26 @@
       if (!room || !room.messages) return;
 
       room.messages.forEach((m, msgIndex) => {
-        const isUser = (m.type === 'user' || m.role === 'user' || m.sender === 'sent');
-        const versions = m.versions || [m.text || ''];
-        const activeIdx = typeof m.activeIndex === 'number' ? m.activeIndex : versions.length - 1;
-        const currentText = versions[activeIdx] || versions[0] || '';
+        const isUser = (m.role === 'user');
+        const activeIdx = m.activeIndex || 0;
+        const currentText = m.versions[activeIdx] || m.versions[0] || '';
 
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${isUser ? 'sent' : 'received'}`;
 
-        // 氣泡本體
         const bubble = document.createElement('div');
         bubble.className = 'msg-bubble';
         bubble.innerText = currentText;
         bubble.onclick = () => openMsgModal(msgIndex);
         wrapper.appendChild(bubble);
 
-        // 如果是 AI 回應，渲染版本切換器與刷新按鈕
+        // 左側 AI 訊息加入版本控制按鈕
         if (!isUser) {
           const controls = document.createElement('div');
           controls.className = 'ai-controls';
           controls.innerHTML = `
             <button class="ai-btn" onclick="switchVersion(${msgIndex}, -1)">‹</button>
-            <span class="version-tag">${activeIdx + 1}/${versions.length}</span>
+            <span class="version-tag">${activeIdx + 1}/${m.versions.length}</span>
             <button class="ai-btn" onclick="switchVersion(${msgIndex}, 1)">›</button>
             <span style="color:#ffd0d8;">|</span>
             <button class="ai-btn" onclick="refreshAiMsg(${msgIndex})">🔄 刷新</button>
@@ -618,34 +655,32 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    /* 4. 刷新 AI 回應 (保留歷次回答) */
+    /* 刷新 AI 回應功能 */
     function refreshAiMsg(msgIndex) {
       const room = chatsData.find(c => c.id === currentRoomId);
       if (!room || !room.messages[msgIndex]) return;
 
-      const newText = prompt('請輸入此版本刷新的 AI 新回應：');
+      const newText = prompt('請輸入這回合 AI 新產生的回應：');
       if (newText && newText.trim() !== '') {
         const msgObj = room.messages[msgIndex];
-        if (!msgObj.versions) msgObj.versions = [msgObj.text || ''];
         msgObj.versions.push(newText.trim());
-        msgObj.activeIndex = msgObj.versions.length - 1; // 自動切換到最新
+        msgObj.activeIndex = msgObj.versions.length - 1;
         saveChatsData();
         renderMessages();
       }
     }
 
-    /* 4. 切換 AI 回應版本 */
+    /* 版本切換功能 */
     function switchVersion(msgIndex, delta) {
       const room = chatsData.find(c => c.id === currentRoomId);
       if (!room || !room.messages[msgIndex]) return;
 
       const msgObj = room.messages[msgIndex];
-      const versions = msgObj.versions || [msgObj.text || ''];
-      let currentIdx = typeof msgObj.activeIndex === 'number' ? msgObj.activeIndex : 0;
+      let currentIdx = msgObj.activeIndex || 0;
 
       currentIdx += delta;
-      if (currentIdx < 0) currentIdx = versions.length - 1;
-      if (currentIdx >= versions.length) currentIdx = 0;
+      if (currentIdx < 0) currentIdx = msgObj.versions.length - 1;
+      if (currentIdx >= msgObj.versions.length) currentIdx = 0;
 
       msgObj.activeIndex = currentIdx;
       saveChatsData();
@@ -662,7 +697,7 @@
 
       if (!room.messages) room.messages = [];
       room.messages.push({
-        type: 'user',
+        role: 'user',
         versions: [val],
         activeIndex: 0
       });
@@ -672,12 +707,11 @@
       input.value = '';
     }
 
-    /* 2 & 3. 訊息操作彈窗Modal (複製/編輯/刪除) */
     function openMsgModal(msgIndex) {
       activeMsgIndex = msgIndex;
       const modal = document.getElementById('msgModal');
       const room = chatsData.find(c => c.id === currentRoomId);
-      const isUser = room.messages[msgIndex].type === 'user';
+      const isUser = room.messages[msgIndex].role === 'user';
       document.getElementById('modalMsgTitle').innerText = isUser ? '我的提示詞選項' : 'AI 回應選項';
       modal.style.display = 'flex';
     }
@@ -689,14 +723,12 @@
       }
     }
 
-    // 3. 一鍵複製提示詞/內容
+    /* 複製內容/提示詞 */
     function copyModalMsg() {
       if (activeMsgIndex === null || !currentRoomId) return;
       const room = chatsData.find(c => c.id === currentRoomId);
       const m = room.messages[activeMsgIndex];
-      const versions = m.versions || [m.text || ''];
-      const activeIdx = m.activeIndex || 0;
-      const textToCopy = versions[activeIdx] || '';
+      const textToCopy = m.versions[m.activeIndex || 0] || '';
 
       navigator.clipboard.writeText(textToCopy).then(() => {
         alert('已成功複製到剪貼簿！');
@@ -706,18 +738,16 @@
       });
     }
 
-    // 2. 編輯雙方訊息
+    /* 編輯雙方訊息 */
     function editModalMsg() {
       if (activeMsgIndex === null || !currentRoomId) return;
       const room = chatsData.find(c => c.id === currentRoomId);
       const m = room.messages[activeMsgIndex];
-      const versions = m.versions || [m.text || ''];
       const activeIdx = m.activeIndex || 0;
 
-      const editedText = prompt('修改訊息內容：', versions[activeIdx]);
+      const editedText = prompt('修改訊息內容：', m.versions[activeIdx]);
       if (editedText !== null && editedText.trim() !== '') {
-        versions[activeIdx] = editedText.trim();
-        m.versions = versions;
+        m.versions[activeIdx] = editedText.trim();
         saveChatsData();
         renderMessages();
         document.getElementById('msgModal').style.display = 'none';
@@ -735,11 +765,11 @@
       }
     }
 
-    /* 數據儲存與 JSON 匯入匯出 */
     function saveChatsData() {
       localStorage.setItem('ios_chats_data', JSON.stringify(chatsData));
     }
 
+    /* 匯出乾淨標準 JSON 檔案 */
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatsData, null, 2));
       const downloadAnchor = document.createElement('a');
@@ -750,6 +780,7 @@
       downloadAnchor.remove();
     }
 
+    /* 匯入 JSON 並自動修正格式 */
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -758,15 +789,11 @@
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            chatsData = imported;
-            saveChatsData();
-            renderChatList();
-            if (currentRoomId) renderMessages();
-            alert('JSON 數據匯入成功！');
-          } else {
-            alert('JSON 格式不正確 (應為對話陣列)');
-          }
+          chatsData = normalizeChatsData(imported);
+          saveChatsData();
+          renderChatList();
+          if (currentRoomId) renderMessages();
+          alert('JSON 數據匯入成功並已格式化！');
         } catch (err) {
           alert('解析 JSON 失敗：' + err.message);
         }
