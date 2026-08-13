@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iPhone</title>
+  <title>Instagram Direct</title>
   <style>
     * {
       box-sizing: border-box;
@@ -22,12 +22,11 @@
       min-height: 100vh;
     }
 
-    /* iPhone 15 Pro 外框結構 */
+    /* iPhone 外框 */
     .iphone {
       width: 393px;
       height: 852px;
-      background-size: cover;
-      background-position: center;
+      background-color: #fff0f3;
       border-radius: 55px;
       box-shadow: 0 0 0 12px #2d2d2d, 0 0 0 13px #1a1a1a, 0 25px 60px rgba(0,0,0,0.8);
       position: relative;
@@ -36,7 +35,7 @@
       flex-direction: column;
     }
 
-    /* 動態島 (Dynamic Island) */
+    /* 動態島 */
     .dynamic-island {
       position: absolute;
       top: 11px;
@@ -47,23 +46,20 @@
       background-color: #000;
       border-radius: 20px;
       z-index: 300;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* iOS 狀態列 */
+    /* iOS 頂部狀態列 */
     .status-bar {
       height: 54px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       padding: 0 28px 10px 28px;
-      color: #fff;
+      color: #ff4d6d;
       font-size: 14px;
       font-weight: 600;
       z-index: 200;
-      position: absolute;
-      top: 0;
-      width: 100%;
+      background-color: #fff0f3;
     }
 
     .status-icons {
@@ -71,6 +67,171 @@
       gap: 6px;
       align-items: center;
       font-size: 12px;
+    }
+
+    /* IG 聊天頂部 Header */
+    .chat-header {
+      height: 60px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid #ffccd5;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #ff4d6d;
+      cursor: pointer;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      border: 1.5px solid #ff758f;
+    }
+
+    .user-info .username {
+      font-size: 15px;
+      font-weight: 600;
+      color: #590d22;
+    }
+
+    .user-info .status {
+      font-size: 11px;
+      color: #ff758f;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 16px;
+      color: #ff4d6d;
+    }
+
+    .header-actions svg {
+      width: 22px;
+      height: 22px;
+      fill: #ff4d6d;
+      cursor: pointer;
+    }
+
+    /* 訊息對話區域 */
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: linear-gradient(180deg, #fff0f3 0%, #ffccd5 100%);
+    }
+
+    .time-divider {
+      text-align: center;
+      font-size: 11px;
+      color: #a37081;
+      margin: 8px 0;
+    }
+
+    .message {
+      display: flex;
+      max-width: 75%;
+      flex-direction: column;
+    }
+
+    .message.received {
+      align-self: flex-start;
+    }
+
+    .message.sent {
+      align-self: flex-end;
+    }
+
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .received .msg-bubble {
+      background-color: #ffffff;
+      color: #590d22;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 6px rgba(255, 182, 193, 0.3);
+    }
+
+    .sent .msg-bubble {
+      background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 2px 8px rgba(255, 77, 109, 0.3);
+    }
+
+    /* 底部輸入欄 */
+    .input-bar {
+      padding: 10px 16px 28px 16px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid #ffccd5;
+    }
+
+    .input-box {
+      flex: 1;
+      height: 40px;
+      background: #fff0f3;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid #ffb3c1;
+    }
+
+    .input-box input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      color: #590d22;
+    }
+
+    .input-box input::placeholder {
+      color: #c9184a;
+      opacity: 0.5;
+    }
+
+    .send-btn {
+      background: none;
+      border: none;
+      color: #ff4d6d;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     /* 底部 Home Bar */
@@ -81,567 +242,94 @@
       transform: translateX(-50%);
       width: 140px;
       height: 5px;
-      background-color: #fff;
+      background-color: #ff758f;
       border-radius: 10px;
       z-index: 400;
-      cursor: pointer;
     }
-
-    /* iOS 鎖屏介面 */
-    .lock-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: inherit;
-      background-size: cover;
-      background-position: center;
-      z-index: 250;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 60px;
-      color: #fff;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .lock-screen.unlocked {
-      transform: translateY(-100%);
-    }
-
-    .lock-date {
-      font-size: 18px;
-      font-weight: 600;
-      opacity: 0.9;
-    }
-
-    .lock-time {
-      font-size: 82px;
-      font-weight: 700;
-      letter-spacing: -2px;
-      line-height: 1;
-      margin-top: 5px;
-    }
-
-    .passcode-container {
-      margin-top: auto;
-      margin-bottom: 80px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .passcode-dots {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 30px;
-    }
-
-    .dot {
-      width: 13px;
-      height: 13px;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      transition: background-color 0.2s;
-    }
-
-    .dot.filled {
-      background-color: #fff;
-    }
-
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px 25px;
-    }
-
-    .key {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      color: #fff;
-      font-size: 26px;
-      font-weight: 400;
-      border: none;
-      outline: none;
-    }
-
-    .key:active {
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    .key span {
-      font-size: 10px;
-      letter-spacing: 2px;
-      margin-top: -2px;
-      font-weight: 600;
-    }
-
-    /* iOS 桌面 */
-    .home-screen {
-      flex: 1;
-      padding: 70px 22px 30px 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 22px 18px;
-    }
-
-    .app-icon {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .app-icon .icon-box {
-      width: 62px;
-      height: 62px;
-      border-radius: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .app-icon span {
-      color: #fff;
-      font-size: 11px;
-      margin-top: 6px;
-      font-weight: 500;
-      letter-spacing: -0.2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-    }
-
-    /* iOS 原生 App 圖示背景與微調 */
-    .icon-settings {
-      background: linear-gradient(180deg, #a8a8ad 0%, #8e8e93 100%);
-    }
-
-    .icon-settings svg {
-      width: 38px;
-      height: 38px;
-      fill: #fff;
-    }
-
-    .icon-twitter {
-      background: #000000;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .icon-twitter svg {
-      width: 30px;
-      height: 30px;
-      fill: #fff;
-    }
-
-    .icon-instagram {
-      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
-    }
-
-    .icon-instagram svg {
-      width: 36px;
-      height: 36px;
-      fill: #fff;
-    }
-
-    /* iOS 桌面 Dock 欄 */
-    .dock {
-      height: 92px;
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: 35px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0 12px;
-    }
-
-    /* App 通用視窗介面 */
-    .app-window {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #f2f2f7;
-      z-index: 150;
-      display: none;
-      flex-direction: column;
-      padding-top: 50px;
-      animation: iosAppOpen 0.35s cubic-bezier(0, 0, 0.2, 1);
-    }
-
-    @keyframes iosAppOpen {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* iOS 設定 APP 樣式 (原生 Grouped 樣式) */
-    .ios-header {
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: #f2f2f7;
-    }
-
-    .ios-header .title {
-      font-size: 17px;
-      font-weight: 600;
-      color: #000;
-    }
-
-    .ios-header .back {
-      color: #007aff;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
-    .ios-settings-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-    }
-
-    .ios-group-title {
-      font-size: 13px;
-      color: #6c6c70;
-      text-transform: uppercase;
-      margin: 0 0 6px 12px;
-    }
-
-    .ios-group {
-      background: #ffffff;
-      border-radius: 10px;
-      margin-bottom: 22px;
-      overflow: hidden;
-    }
-
-    .ios-row {
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      border-bottom: 0.5px solid #c6c6c8;
-      font-size: 17px;
-      color: #000;
-    }
-
-    .ios-row:last-child {
-      border-bottom: none;
-    }
-
-    .ios-row input {
-      border: none;
-      outline: none;
-      text-align: right;
-      font-size: 17px;
-      color: #8e8e93;
-      width: 60%;
-      background: transparent;
-    }
-
-    .ios-row .arrow {
-      color: #c4c4c6;
-      font-size: 20px;
-      margin-left: 6px;
-    }
-
-    .ios-profile {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      background: #fff;
-      border-radius: 10px;
-      margin-bottom: 22px;
-    }
-
-    .avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #ccc;
-      margin-right: 15px;
-      background-size: cover;
-    }
-
-    .profile-info .name { font-size: 20px; font-weight: 500; }
-    .profile-info .sub { font-size: 13px; color: #8e8e93; }
   </style>
 </head>
 <body>
 
-  <div class="iphone" id="iphoneBody">
+  <div class="iphone">
     <!-- 動態島 -->
     <div class="dynamic-island"></div>
 
-    <!-- 頂部狀態列 -->
+    <!-- 狀態列 -->
     <div class="status-bar">
-      <span id="statusBarTime">09:41</span>
+      <span>09:41</span>
       <div class="status-icons">
         <span>5G</span>
-        <span>􀛨</span>
         <span>100%</span>
       </div>
     </div>
 
-    <!-- iOS 鎖屏頁面 -->
-    <div class="lock-screen" id="lockScreen">
-      <div class="lock-date" id="lockDate">9月12日 星期二</div>
-      <div class="lock-time" id="lockTime">09:41</div>
-
-      <div class="passcode-container">
-        <div style="font-size: 14px; margin-bottom: 15px; font-weight: 500;">輸入密碼</div>
-        <div class="passcode-dots">
-          <div class="dot" id="dot0"></div>
-          <div class="dot" id="dot1"></div>
-          <div class="dot" id="dot2"></div>
-          <div class="dot" id="dot3"></div>
-        </div>
-        <div class="keypad">
-          <button class="key" onclick="pressKey('1')">1</button>
-          <button class="key" onclick="pressKey('2')">2<span>ABC</span></button>
-          <button class="key" onclick="pressKey('3')">3<span>DEF</span></button>
-          <button class="key" onclick="pressKey('4')">4<span>GHI</span></button>
-          <button class="key" onclick="pressKey('5')">5<span>JKL</span></button>
-          <button class="key" onclick="pressKey('6')">6<span>MNO</span></button>
-          <button class="key" onclick="pressKey('7')">7<span>PQRS</span></button>
-          <button class="key" onclick="pressKey('8')">8<span>TUV</span></button>
-          <button class="key" onclick="pressKey('9')">9<span>WXYZ</span></button>
-          <div style="width: 70px;"></div>
-          <button class="key" onclick="pressKey('0')">0</button>
-          <button class="key" style="background:none; font-size: 14px;" onclick="deleteKey()">清除</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 主畫面 (桌面) -->
-    <div class="home-screen">
-      <div class="app-grid">
-        <!-- 設定 -->
-        <div class="app-icon" onclick="openApp('settingsApp')">
-          <div class="icon-box icon-settings">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          </div>
-          <span>設定</span>
-        </div>
-
-        <!-- Twitter / X -->
-        <div class="app-icon" onclick="openApp('twitterApp')">
-          <div class="icon-box icon-twitter">
-            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </div>
-          <span>X</span>
-        </div>
-
-        <!-- Instagram -->
-        <div class="app-icon" onclick="openApp('instagramApp')">
-          <div class="icon-box icon-instagram">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </div>
-          <span>Instagram</span>
-        </div>
-      </div>
-
-      <!-- Dock -->
-      <div class="dock">
-        <!-- Dock 圖示預留位置，可自行增加 -->
-      </div>
-    </div>
-
-    <!-- iOS 設定 App 畫面 -->
-    <div id="settingsApp" class="app-window">
-      <div class="ios-header">
-        <button class="back" onclick="closeApp('settingsApp')">‹ 設定</button>
-        <span class="title">設定</span>
-        <span style="width: 40px;"></span>
-      </div>
-      <div class="ios-settings-list">
-        <!-- Apple ID 個人頭像區 -->
-        <div class="ios-profile">
+    <!-- 頂部 Header -->
+    <div class="chat-header">
+      <div class="header-left">
+        <button class="back-btn">‹</button>
+        <div class="header-user">
           <div class="avatar" style="background-image: url('https://picsum.photos/100/100');"></div>
-          <div class="profile-info">
-            <div class="name">iPhone 用戶</div>
-            <div class="sub">Apple ID、iCloud、媒體與購買項目</div>
+          <div class="user-info">
+            <div class="username">我的專屬AI</div>
+            <div class="status">目前線上</div>
           </div>
         </div>
-
-        <div class="ios-group-title">可修改項目</div>
-        <div class="ios-group">
-          <div class="ios-row">
-            <span>解鎖密碼</span>
-            <input type="text" id="settingPasscode" maxlength="4" value="1234" onchange="updatePasscode(this.value)">
-          </div>
-          <div class="ios-row">
-            <span>桌布圖片網址</span>
-            <input type="text" id="settingBgUrl" value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000" onchange="updateBg(this.value)">
-          </div>
-        </div>
-
-        <div class="ios-group-title">系統設定 (預覽)</div>
-        <div class="ios-group">
-          <div class="ios-row"><span>飛行模式</span><span class="arrow">›</span></div>
-          <div class="ios-row"><span>Wi-Fi</span><span style="color:#8e8e93; font-size:15px;">已連線</span></div>
-          <div class="ios-row"><span>藍牙</span><span style="color:#8e8e93; font-size:15px;">開啟</span></div>
-          <div class="ios-row"><span>行動網路</span><span class="arrow">›</span></div>
-        </div>
-
-        <div class="ios-group">
-          <div class="ios-row"><span>通知</span><span class="arrow">›</span></div>
-          <div class="ios-row"><span>聲音與觸覺回饋</span><span class="arrow">›</span></div>
-          <div class="ios-row"><span>專注模式</span><span class="arrow">›</span></div>
-          <div class="ios-row"><span>螢幕使用時間</span><span class="arrow">›</span></div>
-        </div>
+      </div>
+      <div class="header-actions">
+        <svg viewBox="0 0 24 24"><path d="M15.5 12c0 1.93-1.57 3.5-3.5 3.5S8.5 13.93 8.5 12s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5zm-3.5-6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>
       </div>
     </div>
 
-    <!-- Twitter 暫存視窗 -->
-    <div id="twitterApp" class="app-window" style="background:#fff;">
-      <div class="ios-header">
-        <button class="back" onclick="closeApp('twitterApp')">‹ 主畫面</button>
-        <span class="title">X</span>
-        <span style="width: 40px;"></span>
-      </div>
-      <div style="padding:20px; text-align:center; color:#8e8e93;">
-        Twitter / X 介面準備中...
+    <!-- 對話內容區 -->
+    <div class="chat-body" id="chatBody">
+      <div class="time-divider">今天 上午 09:41</div>
+      
+      <div class="message received">
+        <div class="msg-bubble">歡迎來到你的專屬 AI 房間！今天想跟我聊聊什麼呢？</div>
       </div>
     </div>
 
-    <!-- Instagram 暫存視窗 -->
-    <div id="instagramApp" class="app-window" style="background:#fff;">
-      <div class="ios-header">
-        <button class="back" onclick="closeApp('instagramApp')">‹ 主畫面</button>
-        <span class="title">Instagram</span>
-        <span style="width: 40px;"></span>
+    <!-- 輸入欄 -->
+    <div class="input-bar">
+      <div class="input-box">
+        <input type="text" id="messageInput" placeholder="發送訊息..." onkeypress="handleKeyPress(event)">
       </div>
-      <div style="padding:20px; text-align:center; color:#8e8e93;">
-        Instagram 聊天介面準備中...
-      </div>
+      <button class="send-btn" onclick="sendMessage()">發送</button>
     </div>
 
-    <!-- 底部滑動回到主畫面感應條 -->
-    <div class="home-bar" onclick="returnToHome()"></div>
+    <!-- 底部 Home Bar -->
+    <div class="home-bar"></div>
   </div>
 
   <script>
-    // 預設資料
-    let passcode = localStorage.getItem('ios_passcode') || '1234';
-    let bgUrl = localStorage.getItem('ios_bg') || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
-    let inputPasscode = '';
-
-    // 初始化桌布
-    document.getElementById('iphoneBody').style.backgroundImage = `url('${bgUrl}')`;
-    document.getElementById('settingPasscode').value = passcode;
-    document.getElementById('settingBgUrl').value = bgUrl;
-
-    // 即時更新 iOS 時間與日期
-    function updateClock() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
       
-      const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-      const month = now.getMonth() + 1;
-      const date = now.getDate();
-      const dayName = days[now.getDay()];
-
-      document.getElementById('statusBarTime').innerText = `${hours}:${minutes}`;
-      document.getElementById('lockTime').innerText = `${hours}:${minutes}`;
-      document.getElementById('lockDate').innerText = `${month}月${date}日 ${dayName}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // 數字鍵盤輸入
-    function pressKey(num) {
-      if (inputPasscode.length < 4) {
-        inputPasscode += num;
-        updateDots();
-      }
-      
-      if (inputPasscode.length === 4) {
-        setTimeout(() => {
-          if (inputPasscode === passcode) {
-            document.getElementById('lockScreen').classList.add('unlocked');
-            inputPasscode = '';
-            updateDots();
-          } else {
-            alert('密碼不正確');
-            inputPasscode = '';
-            updateDots();
-          }
-        }, 150);
+      if (text !== '') {
+        const chatBody = document.getElementById('chatBody');
+        
+        // 建立訊息氣泡
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message sent';
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.innerText = text;
+        
+        msgDiv.appendChild(bubble);
+        chatBody.appendChild(msgDiv);
+        
+        // 清空輸入框並置底
+        input.value = '';
+        chatBody.scrollTop = chatBody.scrollHeight;
       }
     }
 
-    function deleteKey() {
-      inputPasscode = inputPasscode.slice(0, -1);
-      updateDots();
-    }
-
-    function updateDots() {
-      for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`dot${i}`);
-        if (i < inputPasscode.length) {
-          dot.classList.add('filled');
-        } else {
-          dot.classList.remove('filled');
-        }
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
       }
-    }
-
-    // App 開啟與關閉
-    function openApp(id) {
-      document.getElementById(id).style.display = 'flex';
-    }
-
-    function closeApp(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    function returnToHome() {
-      const apps = document.querySelectorAll('.app-window');
-      apps.forEach(app => app.style.display = 'none');
-    }
-
-    // 設定變更
-    function updatePasscode(val) {
-      if (val.length === 4) {
-        passcode = val;
-        localStorage.setItem('ios_passcode', passcode);
-      } else {
-        alert('密碼必須為4位數字');
-      }
-    }
-
-    function updateBg(val) {
-      bgUrl = val;
-      localStorage.setItem('ios_bg', bgUrl);
-      document.getElementById('iphoneBody').style.backgroundImage = `url('${bgUrl}')`;
     }
   </script>
 </body>
