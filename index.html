@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -482,14 +481,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
 
-        /* 系統警示專屬樣式 */
-        .system-error-message {
-            background-color: #fff5f5;
-            color: #d9534f;
-            border: 1px dashed #d9534f;
-            font-size: 14px;
-        }
-
         .message-actions {
             display: flex;
             align-items: center;
@@ -499,7 +490,6 @@
             flex-wrap: wrap;
         }
 
-        /* 按鈕加大與微光懸停效果 */
         .action-btn {
             background-color: var(--pink-soft);
             color: var(--pink-dark);
@@ -523,7 +513,6 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* 版本切換大按鍵 */
         .version-switcher {
             display: flex;
             align-items: center;
@@ -568,7 +557,6 @@
             100% { background-position: -200% 0; }
         }
 
-        /* 編輯區域加大靈動 */
         .edit-textarea {
             width: 100%;
             min-width: 290px;
@@ -618,7 +606,6 @@
         .btn-edit-cancel { background: #eee; color: #666; }
         .btn-edit-cancel:hover { background: #e0e0e0; }
 
-        /* 底欄輸入區 */
         .input-area {
             padding: 22px 28px;
             background: var(--bg-white);
@@ -652,7 +639,6 @@
             box-shadow: 0 0 12px rgba(255, 182, 193, 0.4);
         }
 
-        /* 放大右下發送大按鍵 */
         .btn-send {
             background: var(--pink-primary);
             color: white;
@@ -675,7 +661,6 @@
             box-shadow: 0 8px 22px rgba(255, 182, 193, 0.7);
         }
 
-        /* 自適應行動端 */
         @media (max-width: 768px) {
             body { 
                 padding: 0; 
@@ -953,7 +938,7 @@
         document.getElementById('model-selector').value = selectedModel;
         document.getElementById('memory-input').value = localStorage.getItem('pink_writer_memory') || '';
 
-        const savedRooms = localStorage.getItem('pink_chat_rooms_v4');
+        const savedRooms = localStorage.getItem('pink_chat_rooms_v5');
         if (savedRooms) {
             rooms = JSON.parse(savedRooms);
         } else {
@@ -970,7 +955,7 @@
     }
 
     function saveRoomsToStorage() {
-        localStorage.setItem('pink_chat_rooms_v4', JSON.stringify(rooms));
+        localStorage.setItem('pink_chat_rooms_v5', JSON.stringify(rooms));
     }
 
     function renderSidebar() {
@@ -1070,7 +1055,7 @@
 
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
-            alert("✨ 提示詞已複製到剪貼簿！");
+            alert("✨ 內容已複製到剪貼簿！");
         }).catch(err => {
             console.error('複製失敗: ', err);
         });
@@ -1084,7 +1069,6 @@
 
         const msgDiv = document.createElement('div');
         
-        let isError = false;
         let textToShow = "";
         let activeIdx = 0;
         let totalVersions = 1;
@@ -1096,10 +1080,9 @@
             activeIdx = msgData.activeIndex || 0;
             textToShow = msgData.versions[activeIdx] || "";
             totalVersions = msgData.versions.length;
-            if (msgData.isError) isError = true;
         }
 
-        msgDiv.className = `message ${type === 'user' ? 'user-message' : 'ai-message'} ${isError ? 'system-error-message' : ''}`;
+        msgDiv.className = `message ${type === 'user' ? 'user-message' : 'ai-message'}`;
         msgDiv.innerText = textToShow;
         container.appendChild(msgDiv);
 
@@ -1108,14 +1091,12 @@
             actionsDiv.className = 'message-actions';
             
             if (type === 'user') {
-                // 編輯提示按鈕
                 const editBtn = document.createElement('button');
                 editBtn.className = 'action-btn';
                 editBtn.innerHTML = '✎ 更改提示';
                 editBtn.onclick = () => enableEditMode(container, index, textToShow, 'user');
                 actionsDiv.appendChild(editBtn);
 
-                // 新增：複製提示按鈕 (加大)
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'action-btn';
                 copyBtn.innerHTML = '📋 複製提示';
@@ -1123,14 +1104,18 @@
                 actionsDiv.appendChild(copyBtn);
 
             } else if (type === 'ai') {
-                // 編輯 AI 回應按鈕 (加大)
                 const editAiBtn = document.createElement('button');
                 editAiBtn.className = 'action-btn';
                 editAiBtn.innerHTML = '✍️ 編輯回應';
                 editAiBtn.onclick = () => enableEditMode(container, index, textToShow, 'ai');
                 actionsDiv.appendChild(editAiBtn);
 
-                // 重試刷新按鈕 (即便系統錯誤，此按鈕也會顯示，且不漏掉任何一個)
+                const copyAiBtn = document.createElement('button');
+                copyAiBtn.className = 'action-btn';
+                copyAiBtn.innerHTML = '📋 複製回應';
+                copyAiBtn.onclick = () => copyToClipboard(textToShow);
+                actionsDiv.appendChild(copyAiBtn);
+
                 const refreshBtn = document.createElement('button');
                 refreshBtn.className = 'action-btn';
                 refreshBtn.innerHTML = '↻ 重試或刷新';
@@ -1138,7 +1123,6 @@
                 actionsDiv.appendChild(refreshBtn);
             }
 
-            // 分支版本切換 (我方舊提示與 AI 回應皆可隨之切換回去)
             if (totalVersions > 1) {
                 const switcher = document.createElement('div');
                 switcher.className = 'version-switcher';
@@ -1168,7 +1152,6 @@
         chatBox.appendChild(container);
     }
 
-    // 支援切換版本：切換我方版本時，對話歷史也會切回該分支，達到「保留我方舊提示詞之AI回應，切換回去時可以察看、延續」
     function switchVersion(msgIndex, direction) {
         const msgData = rooms[currentRoomId].messages[msgIndex];
         let newIdx = msgData.activeIndex + direction;
@@ -1200,21 +1183,15 @@
         const msgObj = rooms[currentRoomId].messages[index];
 
         if (type === 'user') {
-            // 如果是編輯使用者的提示詞，保留舊的提示詞，新增一個版本，並切換到新版本
             msgObj.versions.push(newText);
             msgObj.activeIndex = msgObj.versions.length - 1;
-            
-            // 重要：我們保留該使用者版本之後的所有「分支」。為了在重新生成 AI 回應時，不刪除其他分支，
-            // 我們僅清除「目前索引之後」的對話 (或者在切換時重建歷史)，這裡我們清除此對話後面的內容並請求新回應，但舊提示對應的版本仍完整保留在版本的 versions 陣列中。
             rooms[currentRoomId].messages.splice(index + 1);
             saveRoomsToStorage();
             renderChatBox();
             await fetchAIResponse();
         } else {
-            // 如果是編輯 AI 的回應，直接在此 AI 回應節點下新增一版修改後的文本，不破壞舊回應
             msgObj.versions.push(newText);
             msgObj.activeIndex = msgObj.versions.length - 1;
-            msgObj.isError = false; // 移除報錯標記
             saveRoomsToStorage();
             renderChatBox();
         }
@@ -1222,7 +1199,6 @@
 
     async function requestNewBranch(aiMsgIndex) {
         if (isProcessing) return;
-        // 如果是點擊 AI 訊息的刷新重試，我們保留當前使用者的提示，清除此 AI 回應之後的對話，並在該 AI 節點上新增或刷新版本
         rooms[currentRoomId].messages.splice(aiMsgIndex + 1);
         saveRoomsToStorage();
         await fetchAIResponse(aiMsgIndex);
@@ -1258,7 +1234,6 @@
         }, 300);
     });
 
-    // 建立符合當前選取版本的分支歷史
     function buildApiContents(targetAiIndex = -1) {
         const list = rooms[currentRoomId].messages;
         let apiContents = [];
@@ -1266,7 +1241,6 @@
 
         for (let i = 0; i < limit; i++) {
             const m = list[i];
-            if (m.isError) continue; 
             if (m.type === 'user') {
                 const activeText = m.versions ? m.versions[m.activeIndex || 0] : m.text;
                 apiContents.push({ role: 'user', parts: [{ text: activeText }] });
@@ -1276,6 +1250,34 @@
             }
         }
         return apiContents;
+    }
+
+    // 支援自動重試與自動刷新（帶有指數退避機制）
+    async function callGeminiWithRetry(url, requestBody, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    // 若遇到 503 或伺服器過載，且還有重試次數，則自動等待後重試
+                    if ((data.error.code === 503 || String(data.error.message).includes('503') || String(data.error.message).includes('overloaded')) && i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1500));
+                        continue;
+                    }
+                    throw new Error(`[API 報錯碼 ${data.error.code}]: ${data.error.message}`);
+                }
+                return data;
+            } catch (err) {
+                if (i === maxRetries - 1) throw err;
+                await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1500));
+            }
+        }
     }
 
     async function fetchAIResponse(isRefreshingIndex = -1) {
@@ -1292,7 +1294,7 @@
             if (containerToReplace) {
                 loadingMsg = containerToReplace.querySelector('.message');
                 loadingMsg.className = 'message ai-message loading-pulse';
-                loadingMsg.innerText = '正在重新推敲新章節...🌸';
+                loadingMsg.innerText = '正在重新自動刷新推敲新章節...🌸';
             }
         } else {
             const loadingContainer = document.createElement('div');
@@ -1308,7 +1310,6 @@
         let apiHistory = buildApiContents(isRefreshingIndex);
 
         try {
-            // 配置阻擋情色審查與安全過濾的 BLOCK_NONE 等級
             const requestBody = {
                 contents: apiHistory,
                 systemInstruction: { parts: [{ text: getCombinedSystemInstruction() }] },
@@ -1320,29 +1321,20 @@
                 ]
             };
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(`[API 報錯碼 ${data.error.code}]: ${data.error.message}`);
-            }
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+            const data = await callGeminiWithRetry(url, requestBody);
 
             const candidate = data.candidates?.[0];
             if (!candidate) {
-                throw new Error("Google 未回傳任何可能的回應（candidates 欄位不存在）。可能是連線頻率遭鎖。");
+                throw new Error("Google 未回傳任何可能的回應。可能是連線頻率遭鎖。");
             }
 
             const finishReason = candidate.finishReason;
             if (finishReason && finishReason !== "STOP") {
                 if (finishReason === "SAFETY") {
-                    throw new Error("⚠️ 回應被安全過濾器攔截。已自動將 API 請求放寬至 BLOCK_NONE，若持續出現，請將當前對話中的敏感字眼稍作修飾再重試。");
+                    throw new Error("⚠️ 回應被安全過濾器攔截。已自動放寬至 BLOCK_NONE，若持續出現請稍作修飾再重試。");
                 } else if (finishReason === "RECITATION") {
-                    throw new Error("⚠️ 觸發了重複性抄襲保護機制。");
+                    throw new Error("⚠️ 觸發了重複性保護機制。");
                 } else {
                     throw new Error(`⚠️ Google 拒絕回答。原因代碼: ${finishReason}`);
                 }
@@ -1353,6 +1345,7 @@
                 throw new Error("⚠️ 回應成功但內容為空。");
             }
 
+            // 成功回應：寫入紀錄
             if (isRefreshingIndex === -1) {
                 rooms[currentRoomId].messages.push({
                     type: 'ai',
@@ -1363,28 +1356,13 @@
                 const existingAiMsg = rooms[currentRoomId].messages[isRefreshingIndex];
                 existingAiMsg.versions.push(aiText);
                 existingAiMsg.activeIndex = existingAiMsg.versions.length - 1;
-                existingAiMsg.isError = false; 
             }
             
             saveRoomsToStorage();
         } catch (error) {
             console.error(error);
-            const errorText = error.message || "未知連線異常";
-            
-            if (isRefreshingIndex === -1) {
-                rooms[currentRoomId].messages.push({
-                    type: 'ai',
-                    versions: [errorText],
-                    activeIndex: 0,
-                    isError: true
-                });
-            } else {
-                const existingAiMsg = rooms[currentRoomId].messages[isRefreshingIndex];
-                existingAiMsg.versions.push(errorText);
-                existingAiMsg.activeIndex = existingAiMsg.versions.length - 1;
-                existingAiMsg.isError = true;
-            }
-            saveRoomsToStorage();
+            // 報錯不留紀錄：發生錯誤時，我們直接將剛剛為了載入而產生的臨時 DOM 移除，或是直接重新渲染對話框即可，不 push 進 rooms 陣列！
+            alert(`連線發生狀況：\n${error.message}\n\n不用擔心，此錯誤不會被記錄到對話中，您可以點擊重試或再次發送。`);
         } finally {
             isProcessing = false;
             renderChatBox();
@@ -1398,7 +1376,6 @@
         let fileContent = `=========================================\n🌸 故事劇本線：${room.name}\n🧠 記憶設定備忘：\n${memoryText.trim()}\n=========================================\n\n`;
 
         room.messages.forEach(msg => {
-            if (msg.isError) return;
             const idx = msg.activeIndex || 0;
             if (msg.type === 'user') {
                 const text = msg.versions ? msg.versions[idx] : msg.text;
@@ -1420,7 +1397,7 @@
 
     function downloadAllDataBackup() {
         const dataPackage = {
-            rooms: localStorage.getItem('pink_chat_rooms_v4') || '[]',
+            rooms: localStorage.getItem('pink_chat_rooms_v5') || '[]',
             memory: localStorage.getItem('pink_writer_memory') || ''
         };
         const blob = new Blob([JSON.stringify(dataPackage, null, 2)], { type: 'application/json;charset=utf-8;' });
@@ -1447,7 +1424,7 @@
                 const parsedData = JSON.parse(e.target.result);
                 if (parsedData.rooms) {
                     if (confirm("這會完全覆蓋當前所有房間的進度，確定匯入嗎？")) {
-                        localStorage.setItem('pink_chat_rooms_v4', parsedData.rooms);
+                        localStorage.setItem('pink_chat_rooms_v5', parsedData.rooms);
                         localStorage.setItem('pink_writer_memory', parsedData.memory || '');
                         alert("還原成功！");
                         window.location.reload();
@@ -1456,7 +1433,7 @@
                     alert("格式不符，請上傳正確的 .json 備份檔案。");
                 }
             } catch (err) { alert("檔案讀取失敗。"); }
-            input.value = '';
+            input.value = {};
         };
         reader.readAsText(file);
     }
