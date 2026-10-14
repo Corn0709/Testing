@@ -1252,10 +1252,16 @@
         return apiContents;
     }
 
-    // 支援自動重試與自動刷新（帶有指數退避機制）
-    async function callGeminiWithRetry(url, requestBody, maxRetries = 3) {
-        for (let i = 0; i < maxRetries; i++) {
+    // 無限自動重試直到成功回應為止的核心機制
+    async function callGeminiUntilSuccess(url, requestBody, updateLoadingText) {
+        let attempt = 0;
+        while (true) {
+            attempt++;
             try {
+                if (attempt > 1 && updateLoadingText) {
+                    updateLoadingText(`伺服器忙碌中，正在進行第 ${attempt} 次自動刷新重試...🌸`);
+                }
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1265,17 +1271,45 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    // 若遇到 503 或伺服器過載，且還有重試次數，則自動等待後重試
-                    if ((data.error.code === 503 || String(data.error.message).includes('503') || String(data.error.message).includes('overloaded')) && i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1500));
+                    // 若為 503 或伺服器過載/忙碌，直接進入下一次迴圈自動重試
+                    const errCode = data.error.code;
+                    const errMsg = String(data.error.message || '');
+                    if (errCode === 503 || errMsg.includes('503') || errMsg.includes('overloaded') || errMsg.includes('ResourceExhausted')) {
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // 等待 2 秒後重試
                         continue;
                     }
-                    throw new Error(`[API 報錯碼 ${data.error.code}]: ${data.error.message}`);
+                    throw new Error(`[API 報錯碼 ${errCode}]: ${errMsg}`);
                 }
-                return data;
+
+                const candidate = data.candidates?.[0];
+                if (!candidate) {
+                    throw new Error("Google 未回傳任何內容，自動重試中...");
+                }
+
+                const finishReason = candidate.finishReason;
+                if (finishReason && finishReason !== "STOP") {
+                    if (finishReason === "SAFETY") {
+                        throw new Error("⚠️ 回應被安全過濾器攔截。");
+                    } else {
+                        throw new Error(`⚠️ 拒絕回答，代碼: ${finishReason}`);
+                    }
+                }
+
+                const aiText = candidate.content?.parts?.[0]?.text;
+                if (!aiText) {
+                    throw new Error("⚠️ 回應內容為空，自動重試中...");
+                }
+
+                // 成功拿到回應，直接回傳！
+                return aiText;
+
             } catch (err) {
-                if (i === maxRetries - 1) throw err;
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1500));
+                // 如果是非 503 的嚴重錯誤（例如 API Key 錯誤、安全攔截等），直接中斷拋出
+                if (err.message.includes('API 報錯碼') && !err.message.includes('503')) {
+                    throw err;
+                }
+                // 否則視為短暫網路或伺服器波動，等待 2 秒後繼續自動重試
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
     }
@@ -1294,7 +1328,7 @@
             if (containerToReplace) {
                 loadingMsg = containerToReplace.querySelector('.message');
                 loadingMsg.className = 'message ai-message loading-pulse';
-                loadingMsg.innerText = '正在重新自動刷新推敲新章節...🌸';
+                loadingMsg.innerText = '正在自動刷新推敲新章節...🌸';
             }
         } else {
             const loadingContainer = document.createElement('div');
@@ -1322,30 +1356,13 @@
             };
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
-            const data = await callGeminiWithRetry(url, requestBody);
+            
+            // 呼叫直到成功的自動刷新機制
+            const aiText = await callGeminiUntilSuccess(url, requestBody, (text) => {
+                if (loadingMsg) loadingMsg.innerText = text;
+            });
 
-            const candidate = data.candidates?.[0];
-            if (!candidate) {
-                throw new Error("Google 未回傳任何可能的回應。可能是連線頻率遭鎖。");
-            }
-
-            const finishReason = candidate.finishReason;
-            if (finishReason && finishReason !== "STOP") {
-                if (finishReason === "SAFETY") {
-                    throw new Error("⚠️ 回應被安全過濾器攔截。已自動放寬至 BLOCK_NONE，若持續出現請稍作修飾再重試。");
-                } else if (finishReason === "RECITATION") {
-                    throw new Error("⚠️ 觸發了重複性保護機制。");
-                } else {
-                    throw new Error(`⚠️ Google 拒絕回答。原因代碼: ${finishReason}`);
-                }
-            }
-
-            const aiText = candidate.content?.parts?.[0]?.text;
-            if (!aiText) {
-                throw new Error("⚠️ 回應成功但內容為空。");
-            }
-
-            // 成功回應：寫入紀錄
+            // 成功取得回應後，才寫入對話紀錄
             if (isRefreshingIndex === -1) {
                 rooms[currentRoomId].messages.push({
                     type: 'ai',
@@ -1361,8 +1378,7 @@
             saveRoomsToStorage();
         } catch (error) {
             console.error(error);
-            // 報錯不留紀錄：發生錯誤時，我們直接將剛剛為了載入而產生的臨時 DOM 移除，或是直接重新渲染對話框即可，不 push 進 rooms 陣列！
-            alert(`連線發生狀況：\n${error.message}\n\n不用擔心，此錯誤不會被記錄到對話中，您可以點擊重試或再次發送。`);
+            alert(`發生無法自動恢復的錯誤：\n${error.message}`);
         } finally {
             isProcessing = false;
             renderChatBox();
@@ -1433,7 +1449,7 @@
                     alert("格式不符，請上傳正確的 .json 備份檔案。");
                 }
             } catch (err) { alert("檔案讀取失敗。"); }
-            input.value = {};
+            input.value = '';
         };
         reader.readAsText(file);
     }
