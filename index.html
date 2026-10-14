@@ -1467,3 +1467,22 @@
 </body>
 </html>
 
+
+
+# 遇到 503 時，自動重試並逐漸增加等待時間的邏輯範例
+import time
+
+
+def call_gemini_api(prompt, retries=3):
+  for i in range(retries):
+    try:
+      response = client.models.generate_content(
+          model='gemini-3.8-flash',  # 建議改用比較穩定的版本
+          contents=prompt,
+      )
+      return response
+    except Exception as e:
+      if '503' in str(e) and i < retries - 1:
+        time.sleep(2**i)  # 第 1 次等 1 秒，第 2 次等 2 秒...
+        continue
+      raise e
