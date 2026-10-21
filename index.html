@@ -1271,11 +1271,10 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    // 若為 503 或伺服器過載/忙碌，直接進入下一次迴圈自動重試
                     const errCode = data.error.code;
                     const errMsg = String(data.error.message || '');
                     if (errCode === 503 || errMsg.includes('503') || errMsg.includes('overloaded') || errMsg.includes('ResourceExhausted')) {
-                        await new Promise(resolve => setTimeout(resolve, 2000)); // 等待 2 秒後重試
+                        await new Promise(resolve => setTimeout(resolve, 2000));
                         continue;
                     }
                     throw new Error(`[API 報錯碼 ${errCode}]: ${errMsg}`);
@@ -1300,15 +1299,12 @@
                     throw new Error("⚠️ 回應內容為空，自動重試中...");
                 }
 
-                // 成功拿到回應，直接回傳！
                 return aiText;
 
             } catch (err) {
-                // 如果是非 503 的嚴重錯誤（例如 API Key 錯誤、安全攔截等），直接中斷拋出
                 if (err.message.includes('API 報錯碼') && !err.message.includes('503')) {
                     throw err;
                 }
-                // 否則視為短暫網路或伺服器波動，等待 2 秒後繼續自動重試
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
@@ -1357,12 +1353,10 @@
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
             
-            // 呼叫直到成功的自動刷新機制
             const aiText = await callGeminiUntilSuccess(url, requestBody, (text) => {
                 if (loadingMsg) loadingMsg.innerText = text;
             });
 
-            // 成功取得回應後，才寫入對話紀錄
             if (isRefreshingIndex === -1) {
                 rooms[currentRoomId].messages.push({
                     type: 'ai',
@@ -1430,6 +1424,7 @@
         document.getElementById('restore-file-input').click();
     }
 
+    // 萬能 JSON 匯入還原適配器
     function handleRestoreFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -1438,17 +1433,63 @@
         reader.onload = function(e) {
             try {
                 const parsedData = JSON.parse(e.target.result);
+                let finalRooms = {};
+
+                // 情況 A：本站標準備份格式
                 if (parsedData.rooms) {
-                    if (confirm("這會完全覆蓋當前所有房間的進度，確定匯入嗎？")) {
-                        localStorage.setItem('pink_chat_rooms_v5', parsedData.rooms);
-                        localStorage.setItem('pink_writer_memory', parsedData.memory || '');
-                        alert("還原成功！");
-                        window.location.reload();
-                    }
+                    finalRooms = typeof parsedData.rooms === 'string' ? JSON.parse(parsedData.rooms) : parsedData.rooms;
+                } 
+                // 情況 B：外部匯出工具的 conversation 格式[cite: 2]
+                else if (parsedData.conversation && Array.isArray(parsedData.conversation)) {
+                    let defaultMessages = [];
+                    parsedData.conversation.forEach(item => {
+                        if (item.question) {
+                            const cleanQ = item.question.replace(/<\/?(?:!----|font|dir|style)[^>]*>/gi, '').trim();
+                            if (cleanQ) {
+                                defaultMessages.push({
+                                    type: 'user',
+                                    versions: [cleanQ],
+                                    activeIndex: 0
+                                });
+                            }
+                        }
+                        if (item.answer) {
+                            const cleanAns = item.answer.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '\n').replace(/<[^>]+>/g, '').trim();
+                            if (cleanAns) {
+                                defaultMessages.push({
+                                    type: 'ai',
+                                    versions: [cleanAns],
+                                    activeIndex: 0
+                                });
+                            }
+                        }
+                    });
+
+                    const newId = 'room-' + Date.now();
+                    finalRooms = {
+                        [newId]: {
+                            name: parsedData.title ? `🌸 ${parsedData.title}` : "🌸 匯入的故事線",
+                            messages: defaultMessages
+                        }
+                    };
                 } else {
-                    alert("格式不符，請上傳正確的 .json 備份檔案。");
+                    alert("無法識別的 JSON 格式！");
+                    input.value = '';
+                    return;
                 }
-            } catch (err) { alert("檔案讀取失敗。"); }
+
+                if (confirm("確定要匯入並還原這份對話進度嗎？")) {
+                    localStorage.setItem('pink_chat_rooms_v5', JSON.stringify(finalRooms));
+                    if (parsedData.memory) {
+                        localStorage.setItem('pink_writer_memory', parsedData.memory);
+                    }
+                    alert("還原成功！");
+                    window.location.reload();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("檔案讀取或解析失敗，請確認 JSON 格式是否正確。");
+            }
             input.value = '';
         };
         reader.readAsText(file);
